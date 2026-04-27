@@ -6,52 +6,154 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f4f4f4;
-      padding: 20px;
+      margin: 0;
+      height: 100vh;
+      display: flex;
+    }
+    .container {
+      display: flex;
+      width: 100%;
     }
     .box {
-      background: white;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      flex: 1;
+      padding: 20px;
+      box-sizing: border-box;
+      border-right: 1px solid #ddd;
+      display: flex;
+      flex-direction: column;
+    }
+    .box:last-child {
+      border-right: none;
     }
     textarea {
       width: 100%;
-      height: 80px;
-      margin-bottom: 10px;
+      height: 100%;
       padding: 10px;
+      font-size: 14px;
     }
     button {
-      padding: 8px 15px;
+      margin-top: 10px;
+      padding: 10px;
       border: none;
       background: #007bff;
       color: white;
       border-radius: 5px;
       cursor: pointer;
     }
-    button:hover {
-      background: #0056b3;
-    }
   </style>
 </head>
 <body>
 
-<h2>📋 เครื่องมือก็อปข้อความ</h2>
+<div class="container">
 
-<div class="box">
-  <textarea id="text1">ข้อความตัวอย่าง 1</textarea>
-  <button onclick="copyText('text1')">ก็อปข้อความ</button>
-</div>
+  <div class="box">
+    <textarea id="text1">PDI
+ล้างขัดเคลือบ
+กรอบป้าย
+ค่าชาร์จไฟฟ้า
+ผ้ายางMG
 
-<div class="box">
-  <textarea id="text2">ข้อความตัวอย่าง 2</textarea>
-  <button onclick="copyText('text2')">ก็อปข้อความ</button>
-</div>
+AA NANO CERAMIC
+AA Ceramic Ace+ Sunroof
+AA NANO Ceramic+ Sunroof
+HI-KOOL BLACK EDITION 
+พรม 6D (6ชิ้น)
+พรม 6D (D03) สีดำด้ายดำ
+พรม 6D (D17) สีเทาด้านครีม
+พรม 6D (D06) สีดำด้ายครีม
+พรม 6D (D05) สีไวท์แดงด้ายครีม
+พรม 6D (E10)
+พรม 6D (H03)
+พรม 6D (H16)สีน้ำตาลอ่อน-ครีม
+พรม 6D (E16)น้ำตาลอ่อนด้ายดำ
+พรม 6D (D01) สีกาแฟด้ายครีม
+พรม 6D (D02) สีดำด้ายแดง
+พรม 6D (A04) น้ำตาลเข้ม</textarea>
+    <button onclick="copyText('text1')">ก็อป</button>
+  </div>
 
-<div class="box">
-  <textarea id="text3">ข้อความตัวอย่าง 3</textarea>
-  <button onclick="copyText('text3')">ก็อปข้อความ</button>
+  <div class="box">
+    <textarea id="text2">ผ้ายาง MG
+ค่ารถสไลด์
+ค่าจดทะเบียน
+ค่าแนะนำ
+น้ำมัน
+กล้องบันทึกหน้า+หลัง MG
+กล้องหน้า 3 นิ้ว
+เมมโมรี่การ์ด 16 GB
+ถาดท้าย
+กันสาด
+ประตูท้ายไฟฟ้า
+ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า
+CASH BACK
+เคลือบแก้ว ONE SHOT
+
+เคลือบแก้ว GRAPHENE 1ปี
+HI-KOOL Ceramic BLACK EDITION
+HI-KOOL Bravo Ceramic+Sunroof
+
+HI-KOOL BLACK EDITION+Sunroof
+
+HI KOOL BEYOND Ceramic+Sunroof
+
+SUPER HI KOOL BEYOND Ceramic
+3M Ceramate+Sunroof
+
+HI-KOOL MAX+ Sunroof</textarea>
+    <button onclick="copyText('text2')">ก็อป</button>
+  </div>
+
+  <div class="box">
+    <textarea id="text3">แผ่นซิลิโคนรองแท่นชาร์จไร้สาย
+
+ช่องจัดระเบียนเก็บของใต้คอนโซลกลาง
+ม่านบังแดดหลังคา-เทา
+
+สเกิร์ตรอบคัน (4ชิ้น) RIDER V2
+
+สเกิร์ตรอบคัน พร้อมทำสี
+
+สเกิร์ตรอบคัน พร้อมทำสี (4ชิ้น) SANTO V1
+ม่านเปิด-ปิด ไฟฟ้าอัตโนมัติ
+แม่เหล็กแรงดูดพิเศษ IM MAX
+
+Solar gard blackbold + sunroof
+
+ซับค่าบัตรชาร์จ3%
+
+สเกิร์ตรอบคัน+สปอยเลอร์แนบ(5ชิ้น)SANTO 
+ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า
+
+SUPER HI KOOL Beyond Ceramim
+
+LAMINA CERAMATRIX
+
+สคัพเพลท ชุบ สกรีนโลโก้
+
+ชุดแต่ง SONIC ขอบแดง
+ผ้าคลุมรถซิลเวอร์โค้ท
+
+แผ่นรองใต้เครื่อง MG
+ส่วนลด vat 7%
+ส่วนลดดอกเบี้ย
+ค่าลอกฟิล์ม
+
+cash back
+
+ค่าเปลี่ยนป้ายจังหวัด
+
+ปลอกกุญแจ
+
+หมวก MG G00000192
+
+กล้องบันทึกหน้า+หลัง +ห้องโดยสาร+เมมเมอรี่
+
+ชุดแต่ง SONIC ขอบแดง
+
+ช่องจัดระเบียบเก็บของคนโซลกลาง</textarea>
+    <button onclick="copyText('text3')">ก็อป</button>
+  </div>
+
 </div>
 
 <script>
