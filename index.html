@@ -6,159 +6,156 @@
 <style>
 body {
   font-family: Arial;
-  background: #f5f5f5;
   margin: 0;
-  padding: 20px;
+  height: 100vh;
+  display: flex;
 }
-h2 {
-  margin-top: 30px;
+
+/* แบ่ง 3 คอลัมน์ */
+.container {
+  display: flex;
+  width: 100%;
 }
-.category {
-  background: white;
+
+.column {
+  flex: 1;
   padding: 15px;
-  margin-bottom: 20px;
+  overflow-y: auto;
+  border-right: 1px solid #ddd;
+  box-sizing: border-box;
+}
+
+.column:last-child {
+  border-right: none;
+}
+
+.category {
+  background: #fff;
+  padding: 10px;
+  margin-bottom: 15px;
   border-radius: 10px;
 }
+
+h2 {
+  font-size: 16px;
+  margin: 5px 0 10px;
+}
+
 .item {
-  padding: 8px;
-  margin: 5px 0;
+  padding: 6px;
+  margin: 4px 0;
   background: #eee;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 13px;
 }
+
 .item:hover {
-  background: #d0ebff;
+  background: #cfe8ff;
 }
+
 button {
-  margin-top: 10px;
-  padding: 8px 15px;
+  margin-top: 8px;
+  padding: 5px 10px;
   border: none;
   background: #007bff;
   color: white;
   border-radius: 5px;
   cursor: pointer;
+  font-size: 12px;
 }
 </style>
 </head>
 <body>
 
-<h1>📋 รายการอุปกรณ์ตกแต่งรถ</h1>
+<div class="container">
 
-<div class="category">
-<h2>🔧 งานพื้นฐาน / ค่าใช้จ่าย</h2>
-<div class="item" onclick="copy(this)">PDI</div>
-<div class="item" onclick="copy(this)">ล้างขัดเคลือบ</div>
-<div class="item" onclick="copy(this)">กรอบป้าย</div>
-<div class="item" onclick="copy(this)">ค่าชาร์จไฟฟ้า</div>
-<div class="item" onclick="copy(this)">ค่ารถสไลด์</div>
-<div class="item" onclick="copy(this)">ค่าจดทะเบียน</div>
-<div class="item" onclick="copy(this)">ค่าแนะนำ</div>
-<div class="item" onclick="copy(this)">น้ำมัน</div>
-<div class="item" onclick="copy(this)">ค่าลอกฟิล์ม</div>
-<div class="item" onclick="copy(this)">ค่าเปลี่ยนป้ายจังหวัด</div>
-<div class="item" onclick="copy(this)">ส่วนลด vat 7%</div>
-<div class="item" onclick="copy(this)">ส่วนลดดอกเบี้ย</div>
-<div class="item" onclick="copy(this)">CASH BACK</div>
-<div class="item" onclick="copy(this)">cash back</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+  <!-- คอลัมน์ 1 -->
+  <div class="column">
 
-<div class="category">
-<h2>🪟 ฟิล์ม / เคลือบ</h2>
-<div class="item" onclick="copy(this)">AA NANO CERAMIC</div>
-<div class="item" onclick="copy(this)">AA Ceramic Ace+ Sunroof</div>
-<div class="item" onclick="copy(this)">AA NANO Ceramic+ Sunroof</div>
-<div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION</div>
-<div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION+Sunroof</div>
-<div class="item" onclick="copy(this)">HI-KOOL Ceramic BLACK EDITION</div>
-<div class="item" onclick="copy(this)">HI-KOOL Bravo Ceramic+Sunroof</div>
-<div class="item" onclick="copy(this)">HI KOOL BEYOND Ceramic+Sunroof</div>
-<div class="item" onclick="copy(this)">SUPER HI KOOL BEYOND Ceramic</div>
-<div class="item" onclick="copy(this)">SUPER HI KOOL Beyond Ceramim</div>
-<div class="item" onclick="copy(this)">HI-KOOL MAX+ Sunroof</div>
-<div class="item" onclick="copy(this)">3M Ceramate+Sunroof</div>
-<div class="item" onclick="copy(this)">Solar gard blackbold + sunroof</div>
-<div class="item" onclick="copy(this)">LAMINA CERAMATRIX</div>
-<div class="item" onclick="copy(this)">เคลือบแก้ว ONE SHOT</div>
-<div class="item" onclick="copy(this)">เคลือบแก้ว GRAPHENE 1ปี</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+    <div class="category">
+      <h2>🔧 งานพื้นฐาน</h2>
+      <div class="item" onclick="copy(this)">PDI</div>
+      <div class="item" onclick="copy(this)">ล้างขัดเคลือบ</div>
+      <div class="item" onclick="copy(this)">กรอบป้าย</div>
+      <div class="item" onclick="copy(this)">ค่าชาร์จไฟฟ้า</div>
+      <div class="item" onclick="copy(this)">ค่ารถสไลด์</div>
+      <div class="item" onclick="copy(this)">ค่าจดทะเบียน</div>
+      <div class="item" onclick="copy(this)">ค่าแนะนำ</div>
+      <div class="item" onclick="copy(this)">น้ำมัน</div>
+      <div class="item" onclick="copy(this)">ค่าลอกฟิล์ม</div>
+      <div class="item" onclick="copy(this)">ค่าเปลี่ยนป้ายจังหวัด</div>
+      <div class="item" onclick="copy(this)">ส่วนลด vat 7%</div>
+      <div class="item" onclick="copy(this)">ส่วนลดดอกเบี้ย</div>
+      <div class="item" onclick="copy(this)">CASH BACK</div>
+    </div>
 
-<div class="category">
-<h2>🚗 อุปกรณ์ภายนอก</h2>
-<div class="item" onclick="copy(this)">กันสาด</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น) RIDER V2</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี (4ชิ้น) SANTO V1</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน+สปอยเลอร์แนบ(5ชิ้น)SANTO</div>
-<div class="item" onclick="copy(this)">ชุดแต่ง SONIC ขอบแดง</div>
-<div class="item" onclick="copy(this)">ผ้าคลุมรถซิลเวอร์โค้ท</div>
-<div class="item" onclick="copy(this)">แผ่นรองใต้เครื่อง MG</div>
-<div class="item" onclick="copy(this)">สคัพเพลท ชุบ สกรีนโลโก้</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+    <div class="category">
+      <h2>🪟 ฟิล์ม</h2>
+      <div class="item" onclick="copy(this)">AA NANO CERAMIC</div>
+      <div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION</div>
+      <div class="item" onclick="copy(this)">3M Ceramate+Sunroof</div>
+      <div class="item" onclick="copy(this)">LAMINA CERAMATRIX</div>
+      <div class="item" onclick="copy(this)">Solar gard blackbold + sunroof</div>
+    </div>
 
-<div class="category">
-<h2>🛋️ อุปกรณ์ภายใน</h2>
-<div class="item" onclick="copy(this)">พรม 6D (6ชิ้น)</div>
-<div class="item" onclick="copy(this)">พรม 6D (D03) สีดำด้ายดำ</div>
-<div class="item" onclick="copy(this)">พรม 6D (D17) สีเทาด้านครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D06) สีดำด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D05) สีไวท์แดงด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (E10)</div>
-<div class="item" onclick="copy(this)">พรม 6D (H03)</div>
-<div class="item" onclick="copy(this)">พรม 6D (H16)สีน้ำตาลอ่อน-ครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (E16)น้ำตาลอ่อนด้ายดำ</div>
-<div class="item" onclick="copy(this)">พรม 6D (D01) สีกาแฟด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D02) สีดำด้ายแดง</div>
-<div class="item" onclick="copy(this)">พรม 6D (A04) น้ำตาลเข้ม</div>
-<div class="item" onclick="copy(this)">ผ้ายาง MG</div>
-<div class="item" onclick="copy(this)">ช่องจัดระเบียนเก็บของใต้คอนโซลกลาง</div>
-<div class="item" onclick="copy(this)">ช่องจัดระเบียบเก็บของคนโซลกลาง</div>
-<div class="item" onclick="copy(this)">ม่านบังแดดหลังคา-เทา</div>
-<div class="item" onclick="copy(this)">ม่านเปิด-ปิด ไฟฟ้าอัตโนมัติ</div>
-<div class="item" onclick="copy(this)">แผ่นซิลิโคนรองแท่นชาร์จไร้สาย</div>
-<div class="item" onclick="copy(this)">ถาดท้าย</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+  </div>
 
-<div class="category">
-<h2>📷 อุปกรณ์เสริม / เทคโนโลยี</h2>
-<div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง MG</div>
-<div class="item" onclick="copy(this)">กล้องหน้า 3 นิ้ว</div>
-<div class="item" onclick="copy(this)">เมมโมรี่การ์ด 16 GB</div>
-<div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง +ห้องโดยสาร+เมมเมอรี่</div>
-<div class="item" onclick="copy(this)">แม่เหล็กแรงดูดพิเศษ IM MAX</div>
-<div class="item" onclick="copy(this)">ซับค่าบัตรชาร์จ3%</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+  <!-- คอลัมน์ 2 -->
+  <div class="column">
 
-<div class="category">
-<h2>⚙️ ระบบไฟฟ้า / ฟังก์ชัน</h2>
-<div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า</div>
-<div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
-</div>
+    <div class="category">
+      <h2>🛋️ ภายใน</h2>
+      <div class="item" onclick="copy(this)">พรม 6D (6ชิ้น)</div>
+      <div class="item" onclick="copy(this)">พรม 6D (D03)</div>
+      <div class="item" onclick="copy(this)">พรม 6D (D17)</div>
+      <div class="item" onclick="copy(this)">พรม 6D (D06)</div>
+      <div class="item" onclick="copy(this)">ผ้ายาง MG</div>
+      <div class="item" onclick="copy(this)">ช่องจัดระเบียนเก็บของ</div>
+      <div class="item" onclick="copy(this)">ม่านบังแดด</div>
+      <div class="item" onclick="copy(this)">ถาดท้าย</div>
+    </div>
 
-<div class="category">
-<h2>🎁 ของแถม / อื่นๆ</h2>
-<div class="item" onclick="copy(this)">ปลอกกุญแจ</div>
-<div class="item" onclick="copy(this)">หมวก MG G00000192</div>
-<button onclick="copyCategory(this)">ก็อปทั้งหมวด</button>
+    <div class="category">
+      <h2>📷 เทคโนโลยี</h2>
+      <div class="item" onclick="copy(this)">กล้องหน้า+หลัง</div>
+      <div class="item" onclick="copy(this)">กล้อง 3 นิ้ว</div>
+      <div class="item" onclick="copy(this)">เมม 16GB</div>
+    </div>
+
+  </div>
+
+  <!-- คอลัมน์ 3 -->
+  <div class="column">
+
+    <div class="category">
+      <h2>🚗 ภายนอก</h2>
+      <div class="item" onclick="copy(this)">กันสาด</div>
+      <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน</div>
+      <div class="item" onclick="copy(this)">ชุดแต่ง SONIC</div>
+      <div class="item" onclick="copy(this)">ผ้าคลุมรถ</div>
+    </div>
+
+    <div class="category">
+      <h2>⚙️ ฟังก์ชัน</h2>
+      <div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า</div>
+      <div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
+    </div>
+
+    <div class="category">
+      <h2>🎁 อื่นๆ</h2>
+      <div class="item" onclick="copy(this)">ปลอกกุญแจ</div>
+      <div class="item" onclick="copy(this)">หมวก MG</div>
+    </div>
+
+  </div>
+
 </div>
 
 <script>
 function copy(el) {
   navigator.clipboard.writeText(el.innerText);
   alert("คัดลอก: " + el.innerText);
-}
-
-function copyCategory(btn) {
-  const items = btn.parentElement.querySelectorAll(".item");
-  let text = "";
-  items.forEach(i => text += i.innerText + "\\n");
-  navigator.clipboard.writeText(text);
-  alert("คัดลอกทั้งหมวดแล้ว");
 }
 </script>
 
