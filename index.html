@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>รายการอุปกรณ์รถ</title>
+
 <style>
 body {
   font-family: Arial;
@@ -48,12 +49,20 @@ h2 {
   border-radius: 5px;
   cursor: pointer;
   font-size: 13px;
+  transition: 0.2s;
 }
 
 .item:hover {
   background: #cfe8ff;
 }
+
+/* ไฮไลท์ตัวล่าสุด */
+.item.active {
+  background: #7cc5ff !important;
+  color: #000;
+}
 </style>
+
 </head>
 <body>
 
@@ -176,26 +185,44 @@ h2 {
 </div>
 
 <script>
+let lastActive = null;
+
 function copy(el) {
   const text = el.innerText;
 
+  // คัดลอก
   if (navigator.clipboard && window.isSecureContext) {
-    navigator.clipboard.writeText(text)
-      .then(() => alert("คัดลอก: " + text))
-      .catch(() => fallbackCopy(text));
+    navigator.clipboard.writeText(text).catch(() => {
+      fallbackCopy(text);
+    });
   } else {
     fallbackCopy(text);
   }
+
+  // ไฮไลท์ตัวล่าสุด
+  if (lastActive) {
+    lastActive.classList.remove("active");
+  }
+
+  el.classList.add("active");
+  lastActive = el;
 }
 
 function fallbackCopy(text) {
   const textarea = document.createElement("textarea");
   textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
   document.body.appendChild(textarea);
   textarea.select();
-  document.execCommand("copy");
+
+  try {
+    document.execCommand("copy");
+  } catch (err) {
+    console.error("copy ไม่สำเร็จ");
+  }
+
   document.body.removeChild(textarea);
-  alert("คัดลอก: " + text);
 }
 </script>
 
