@@ -12,6 +12,46 @@ body {
   display: flex;
 }
 
+/* ===== Top Bar ===== */
+.topbar{
+    position:fixed;
+    top:0;
+    left:0;
+    right:0;
+    height:70px;
+    background:linear-gradient(90deg,#d90000,#ff2d2d);
+    display:flex;
+    align-items:center;
+    padding:0 20px;
+    box-shadow:0 3px 10px rgba(0,0,0,.25);
+    z-index:9999;
+}
+
+.topbar img{
+    width:50px;
+    height:50px;
+    object-fit:contain;
+    margin-right:15px;
+}
+
+.topbar h1{
+    color:#fff;
+    margin:0;
+    font-size:24px;
+    font-weight:bold;
+}
+
+.topbar span{
+    color:#ffe9e9;
+    font-size:14px;
+    display:block;
+}
+
+.container{
+    margin-top:70px;
+    height:calc(100vh - 70px);
+}
+
 .container {
   display: flex;
   width: 100%;
@@ -65,6 +105,17 @@ h2 {
 
 </head>
 <body>
+
+<div class="topbar">
+
+    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
+
+    <div>
+        <h1>รายการอุปกรณ์รถ MG</h1>
+        <span>Accessory Copy Tool</span>
+    </div>
+
+</div>
 
 <div class="container">
 
