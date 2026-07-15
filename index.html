@@ -5,170 +5,148 @@
 <title>รายการอุปกรณ์รถ</title>
 
 <style>
+/* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   margin: 0;
   height: 100vh;
   display: flex;
+  flex-direction: column;
+  background: transparent !important;
+  overflow: hidden;
 }
 
-/* ===== Top Bar ===== */
-.topbar{
-    position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    height:70px;
-    background:linear-gradient(90deg,#d90000,#ff2d2d);
-    display:flex;
-    align-items:center;
-    padding:0 20px;
-    box-shadow:0 3px 10px rgba(0,0,0,.25);
-    z-index:9999;
-}
-
-.topbar img{
-    width:120px;
-    height:50px;
-    object-fit:contain;
-    margin-right:15px;
-}
-
-.topbar h1{
-    color:#fff;
-    margin:0;
-    font-size:24px;
-    font-weight:bold;
-}
-
-.topbar span{
-    color:#ffe9e9;
-    font-size:14px;
-    display:block;
-}
-
-.container{
-    margin-top:70px;
-    height:calc(100vh - 70px);
-}
-
-.container {
-  display: flex;
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
+#bg-video {
+  position: fixed;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
 }
 
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25); /* ฟิล์มดำบางๆ ช่วยให้ตัวอักษรอ่านง่ายขึ้น */
+  z-index: -1;
+}
+
+/* ===== แถบด้านบน (Top Bar) ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(90deg, #d90000, #ff2d2d);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+}
+
+.topbar img {
+  width: 120px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+}
+
+.topbar h1 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.topbar span {
+  color: #ffe9e9;
+  font-size: 14px;
+  display: block;
+}
+
+/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลางและยืดเต็มจอปกติ (Layout) ===== */
+.container {
+  margin-top: 70px;
+  height: calc(100vh - 70px);
+  width: 100%;
+  max-width: 1600px; /* จำกัดความกว้างให้พอดีสายตา ไม่ยืดกว้างเกินไป */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  padding: 15px;
+  gap: 15px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== คอลัมน์ (ปรับให้เป็นกระจกใส โค้งมน) ===== */
 .column {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   padding: 15px;
   overflow-y: auto;
-  border-right: 1px solid #ddd;
-  box-sizing: border-box;
-  background: #f7f7f7;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25) !important; /* ปรับระดับความใสตรงนี้ */
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
 }
 
-.column:last-child {
-  border-right: none;
-}
-
+/* ===== กล่องหมวดหมู่ย่อยด้านใน ===== */
 .category {
-  background: #fff;
-  padding: 12px;
+  background: rgba(255, 255, 255, 0.4) !important;
+  padding: 15px;
   margin-bottom: 15px;
-  border-radius: 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 h2 {
   font-size: 16px;
-  margin-bottom: 10px;
+  margin-top: 0;
+  margin-bottom: 12px;
+  color: #111;
+  font-weight: bold;
 }
 
+/* ===== ปุ่มรายการแต่ละแถว (ปรับสไตล์มินิมอลหรูๆ) ===== */
 .item {
-  padding: 6px;
-  margin: 4px 0;
-  background: #eee;
-  border-radius: 5px;
+  padding: 10px 12px;
+  margin: 6px 0;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
   cursor: pointer;
   font-size: 13px;
-  transition: 0.2s;
+  font-weight: 500;
+  color: #222;
+  transition: all 0.2s ease;
 }
 
 .item:hover {
-  background: #cfe8ff;
+  background: rgba(207, 232, 255, 0.9) !important;
+  transform: translateX(4px); /* เอฟเฟกต์เลื่อนขวาเบาๆ เวลาเอาเมาส์ชี้ */
 }
 
-/* ไฮไลท์ตัวล่าสุด */
+/* ไฮไลท์ตัวล่าสุดเมื่อกดคัดลอก */
 .item.active {
-  background: #7cc5ff !important;
-  color: #000;
+  background: #2f96ec !important;
+  color: #fff;
+  font-weight: bold;
+  border-color: #2f96ec;
+  box-shadow: 0 0 10px rgba(47, 150, 236, 0.5);
 }
-
-/* วิดีโอพื้นหลัง */
-/* 1. ตัววิดีโออยู่หลังสุด */
-#bg-video {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    z-index: -2; /* ปรับเป็นลบ เพื่อให้อยู่หลังสุดจริงๆ */
-}
-
-/* 2. แผ่นฟิล์มสีดำจางๆ ช่วยดึงให้ตัวหนังสือเด่นขึ้น (ถ้าไม่อยากให้วิดีโอมืด ให้ปรับ 0.3 ลง) */
-.video-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.2); /* เปลี่ยนจาก 0.3 เหลือ 0.2 หรือ 0.1 เพื่อให้วิดีโอชัดขึ้น */
-    z-index: -1; /* อยู่เหนือวิดีโอ แต่ยังอยู่ใต้กล่องข้อความ */
-}
-
-/* 3. ส่วนของเนื้อหาและกล่องข้อความทั้งหมด */
-.topbar, .container {
-    position: relative;
-    z-index: 1; /* อยู่บนสุดเหนือวิดีโอและฟิล์ม */
-}
-
-/* Overlay เพื่อให้ข้อความอ่านง่าย */
-.video-overlay{
-    position: fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background: rgba(0,0,0,.30);
-    z-index:-1;
-}
-
-  body{
-    background: transparent !important;
-}
-
-/* กล่องหลัก */
-/* บรรทัดที่ 144 เป็นต้นไป */
-.container,
-.card,
-.section,
-.category,
-.column {
-    background: rgba(255, 255, 255, 0.3) !important; /* ปรับตรงนี้จาก .75 เหลือ .3 หรือ .4 จะโปร่งใสขึ้นมากครับ */
-    backdrop-filter: blur(10px); /* เพิ่มค่าเบลอเพื่อให้ดูสวยขึ้น */
-    -webkit-backdrop-filter: blur(10px);
-    position: relative; /* เพิ่มบรรทัดนี้ เพื่อให้แน่ใจว่าเลเยอร์เรียงลำดับถูกต้อง */
-    z-index: 1;
-}
-
-/* Header */
-header{
-    background: rgba(220,0,0,.85) !important;
-    backdrop-filter: blur(10px);
-}
-
-/* รายการแต่ละแถว */
-.item,
-.list-item,
-button{
-    background: rgba(255,255,255,.65);
-}
-  
 </style>
 
 </head>
