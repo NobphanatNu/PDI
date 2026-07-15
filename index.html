@@ -152,9 +152,48 @@ h2 {
 </head>
 <body>
 
-<video id="bg-video" autoplay muted loop playsinline>
-    <source src="https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4" type="video/mp4">
-</video>
+// ลิงก์วิดีโอทั้ง 3 ตัวที่คุณส่งมา ปรับให้เล่นวนไปเรื่อยๆ เรียบร้อยครับ
+const videoSources = [
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4", // วิดีโอที่ 1
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4", // วิดีโอที่ 2
+  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"                  // วิดีโอที่ 3
+];
+
+let currentVideoIndex = 0;
+const videoPlayer = document.getElementById("bg-video");
+
+// ฟังก์ชันสำหรับเปลี่ยนและเล่นวิดีโอถัดไป
+function playNextVideo() {
+  if (videoSources.length === 0) return;
+  
+  // ใส่ลิงก์วิดีโอปัจจุบัน
+  videoPlayer.src = videoSources[currentVideoIndex];
+  videoPlayer.load();
+  
+  // สั่งให้เล่นวิดีโอ
+  videoPlayer.play().catch(err => {
+    console.log("วิดีโอเล่นไม่ได้หรือโหลดช้า กำลังข้ามไปตัวถัดไป...", err);
+    // เซฟความปลอดภัย: ถ้าคลิปไหนโหลดไม่ได้ ให้ข้ามไปคลิปต่อไปทันที
+    setTimeout(playNextVideo, 1000); 
+  });
+  
+  // ขยับตัวนับเลเวลวิดีโอ ถ้ารอบครบให้วนกลับมาเริ่ม 0 ใหม่
+  currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+}
+
+// เมื่อวิดีโอปัจจุบันเล่นจนจบ ให้เรียกคลิปต่อไปมาเล่นทันที
+videoPlayer.addEventListener("ended", playNextVideo);
+
+// ป้องกันระบบค้าง เมื่อวิดีโอเกิดข้อผิดพลาดในการโหลด
+videoPlayer.addEventListener("error", () => {
+    console.log("เกิดข้อผิดพลาดในการโหลดไฟล์วิดีโอ ข้ามไปคลิปถัดไป...");
+    playNextVideo();
+}); // <-- เติม วงเล็บปีกกาและวงเล็บปิด ตรงนี้ให้เรียบร้อย
+
+// เริ่มทำงานทันทีเมื่อหน้าเว็บโหลดเสร็จ
+window.addEventListener("DOMContentLoaded", playNextVideo);
+
+</script>   <!-- 👈 พิมพ์เติมบรรทัดนี้ลงไปตรงนี้เลยครับ! -->
 
 <div class="video-overlay"></div>
 
