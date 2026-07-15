@@ -101,10 +101,67 @@ h2 {
   background: #7cc5ff !important;
   color: #000;
 }
+
+/* วิดีโอพื้นหลัง */
+#bg-video{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -2;
+}
+
+/* Overlay เพื่อให้ข้อความอ่านง่าย */
+.video-overlay{
+    position: fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,.30);
+    z-index:-1;
+}
+
+  body{
+    background: transparent !important;
+}
+
+/* กล่องหลัก */
+.container,
+.card,
+.section,
+.category,
+.column{
+    background: rgba(255,255,255,.75) !important;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Header */
+header{
+    background: rgba(220,0,0,.85) !important;
+    backdrop-filter: blur(10px);
+}
+
+/* รายการแต่ละแถว */
+.item,
+.list-item,
+button{
+    background: rgba(255,255,255,.65);
+}
+  
 </style>
 
 </head>
 <body>
+
+<video id="bg-video" autoplay muted loop playsinline>
+    <source src="https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4" type="video/mp4">
+</video>
+
+<div class="video-overlay"></div>
 
 <div class="topbar">
 
