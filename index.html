@@ -152,10 +152,14 @@ h2 {
 </head>
 <body>
 
+<body>
+
+<!-- 1. ใส่แท็กสร้างเครื่องเล่นวิดีโอก่อน -->
+<video id="bg-video" autoplay muted playsinline></video>
+<div class="video-overlay"></div>
 <!-- 👈 ตรวจสอบและพิมพ์เติมแท็ก <script> ตรงนี้เลยครับ -->
 <script>
-
-// ลิงก์วิดีโอทั้ง 3 ตัวที่คุณส่งมา ปรับให้เล่นวนไปเรื่อยๆ เรียบร้อยครับ
+// ลิงก์วิดีโอทั้ง 3 ตัว ปรับให้เล่นวนไปเรื่อยๆ ครับ
 const videoSources = [
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
@@ -165,40 +169,27 @@ const videoSources = [
 let currentVideoIndex = 0;
 const videoPlayer = document.getElementById("bg-video");
 
-// ... (โค้ดส่วนอื่นปล่อยไว้เหมือนเดิมได้เลย) ...
-
-// ฟังก์ชันสำหรับเปลี่ยนและเล่นวิดีโอถัดไป
 function playNextVideo() {
-  if (videoSources.length === 0) return;
+  if (!videoPlayer || videoSources.length === 0) return;
   
-  // ใส่ลิงก์วิดีโอปัจจุบัน
   videoPlayer.src = videoSources[currentVideoIndex];
   videoPlayer.load();
   
-  // สั่งให้เล่นวิดีโอ
   videoPlayer.play().catch(err => {
-    console.log("วิดีโอเล่นไม่ได้หรือโหลดช้า กำลังข้ามไปตัวถัดไป...", err);
-    // เซฟความปลอดภัย: ถ้าคลิปไหนโหลดไม่ได้ ให้ข้ามไปคลิปต่อไปทันที
+    console.log("วิดีโอโหลดไม่สำเร็จ กำลังข้ามไปตัวถัดไป...", err);
     setTimeout(playNextVideo, 1000); 
   });
   
-  // ขยับตัวนับเลเวลวิดีโอ ถ้ารอบครบให้วนกลับมาเริ่ม 0 ใหม่
   currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
 }
 
-// เมื่อวิดีโอปัจจุบันเล่นจนจบ ให้เรียกคลิปต่อไปมาเล่นทันที
-videoPlayer.addEventListener("ended", playNextVideo);
+if (videoPlayer) {
+  videoPlayer.addEventListener("ended", playNextVideo);
+  videoPlayer.addEventListener("error", playNextVideo);
+}
 
-// ป้องกันระบบค้าง เมื่อวิดีโอเกิดข้อผิดพลาดในการโหลด
-videoPlayer.addEventListener("error", () => {
-    console.log("เกิดข้อผิดพลาดในการโหลดไฟล์วิดีโอ ข้ามไปคลิปถัดไป...");
-    playNextVideo();
-}); // <-- เติม วงเล็บปีกกาและวงเล็บปิด ตรงนี้ให้เรียบร้อย
-
-// เริ่มทำงานทันทีเมื่อหน้าเว็บโหลดเสร็จ
 window.addEventListener("DOMContentLoaded", playNextVideo);
-
-</script>   <!-- 👈 พิมพ์เติมบรรทัดนี้ลงไปตรงนี้เลยครับ! -->
+</script>
 
 <div class="video-overlay"></div>
 
