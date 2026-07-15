@@ -5,21 +5,24 @@
 <title>รายการอุปกรณ์รถ</title>
 
 <style>
+
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
+  
 /* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
 * {
   box-sizing: border-box;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Sarabun', Arial, sans-serif; /* เปลี่ยนเป็น TH Sarabun */
   margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
   background: transparent !important;
   overflow: hidden;
+  font-size: 16px; /* ขยายขนาดเริ่มต้นให้อ่านง่ายขึ้น */
 }
-
 /* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
 #bg-video {
   position: fixed;
@@ -113,14 +116,14 @@ body {
 }
 
 h2 {
-  font-size: 16px;
+  font-family: 'Sarabun', Arial, sans-serif;
+  font-size: 19px; /* ขยายขนาดหัวข้อ */
   margin-top: 0;
   margin-bottom: 12px;
   color: #111;
-  font-weight: bold;
+  font-weight: 700;
 }
 
-/* ===== ปุ่มรายการแต่ละแถว (ปรับสไตล์มินิมอลหรูๆ) ===== */
 .item {
   padding: 10px 12px;
   margin: 6px 0;
@@ -128,7 +131,8 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   cursor: pointer;
-  font-size: 13px;
+  font-family: 'Sarabun', Arial, sans-serif;
+  font-size: 15px; /* ขยายขนาดตัวอักษรปุ่ม */
   font-weight: 500;
   color: #222;
   transition: all 0.2s ease;
