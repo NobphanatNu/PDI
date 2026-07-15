@@ -152,15 +152,20 @@ h2 {
 </head>
 <body>
 
+<!-- 👈 ตรวจสอบและพิมพ์เติมแท็ก <script> ตรงนี้เลยครับ -->
+<script>
+
 // ลิงก์วิดีโอทั้ง 3 ตัวที่คุณส่งมา ปรับให้เล่นวนไปเรื่อยๆ เรียบร้อยครับ
 const videoSources = [
-  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4", // วิดีโอที่ 1
-  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4", // วิดีโอที่ 2
-  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"                  // วิดีโอที่ 3
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
+  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
 ];
 
 let currentVideoIndex = 0;
 const videoPlayer = document.getElementById("bg-video");
+
+// ... (โค้ดส่วนอื่นปล่อยไว้เหมือนเดิมได้เลย) ...
 
 // ฟังก์ชันสำหรับเปลี่ยนและเล่นวิดีโอถัดไป
 function playNextVideo() {
