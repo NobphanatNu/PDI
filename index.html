@@ -103,26 +103,28 @@ h2 {
 }
 
 /* วิดีโอพื้นหลัง */
-#bg-video{
+/* 1. ตัววิดีโออยู่หลังสุด */
+#bg-video {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    z-index: 0;
+    z-index: -2; /* ปรับเป็นลบ เพื่อให้อยู่หลังสุดจริงๆ */
 }
 
-.video-overlay{
+/* 2. แผ่นฟิล์มสีดำจางๆ ช่วยดึงให้ตัวหนังสือเด่นขึ้น (ถ้าไม่อยากให้วิดีโอมืด ให้ปรับ 0.3 ลง) */
+.video-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.3);
-    z-index: 1;
+    background: rgba(0, 0, 0, 0.2); /* เปลี่ยนจาก 0.3 เหลือ 0.2 หรือ 0.1 เพื่อให้วิดีโอชัดขึ้น */
+    z-index: -1; /* อยู่เหนือวิดีโอ แต่ยังอยู่ใต้กล่องข้อความ */
 }
 
-.topbar,
-.container{
+/* 3. ส่วนของเนื้อหาและกล่องข้อความทั้งหมด */
+.topbar, .container {
     position: relative;
-    z-index: 2;
+    z-index: 1; /* อยู่บนสุดเหนือวิดีโอและฟิล์ม */
 }
 
 /* Overlay เพื่อให้ข้อความอ่านง่าย */
@@ -141,14 +143,17 @@ h2 {
 }
 
 /* กล่องหลัก */
+/* บรรทัดที่ 144 เป็นต้นไป */
 .container,
 .card,
 .section,
 .category,
-.column{
-    background: rgba(255,255,255,.75) !important;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+.column {
+    background: rgba(255, 255, 255, 0.3) !important; /* ปรับตรงนี้จาก .75 เหลือ .3 หรือ .4 จะโปร่งใสขึ้นมากครับ */
+    backdrop-filter: blur(10px); /* เพิ่มค่าเบลอเพื่อให้ดูสวยขึ้น */
+    -webkit-backdrop-filter: blur(10px);
+    position: relative; /* เพิ่มบรรทัดนี้ เพื่อให้แน่ใจว่าเลเยอร์เรียงลำดับถูกต้อง */
+    z-index: 1;
 }
 
 /* Header */
