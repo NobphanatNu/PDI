@@ -156,7 +156,37 @@ h2 {
 </head>
 <body>
 
-<body>
+    <!-- มัดรวมก้อนนี้ไปวางต่อท้าย body ทันที -->
+    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+    <style>
+        .btn-logout {
+            padding: 8px 18px;
+            background-color: #e53e3e;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Sarabun', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
+            /* แนะนำให้เพิ่ม 3 บรรทัดนี้เพื่อให้ปุ่มลอยเด่นอยู่มุมบนขวา ไม่รบกวนเนื้อหาอื่น */
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .btn-logout:hover {
+            background-color: #c53030;
+            box-shadow: 0 4px 6px rgba(197, 48, 48, 0.3);
+            transform: translateY(-1px);
+        }
+        .btn-logout:active {
+            transform: translateY(0);
+        }
+    </style>
+
+    <!-- จากตรงนี้จะเป็นโค้ดเนื้อหาเดิมของหน้าเว็บคุณ... -->
 
 <!-- 1. ใส่แท็กสร้างเครื่องเล่นวิดีโอก่อน -->
 <video id="bg-video" autoplay muted playsinline></video>
@@ -385,6 +415,14 @@ function fallbackCopy(text) {
 
   document.body.removeChild(textarea);
 }
+</script>
+
+  <script>
+    // สั่งการเมื่อมีการกดปุ่มออกจากระบบ
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+        // ดีดผู้ใช้งานกลับไปที่หน้าล็อกอินจำลอง
+        window.location.href = 'index.html';
+    });
 </script>
 
 </body>
