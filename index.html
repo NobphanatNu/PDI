@@ -196,24 +196,29 @@
     </div>
 
     <script>
-        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง ---
+        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง (ปรับปรุงใหม่ให้สลับแน่นอน) ---
         const videoUrls = [
-            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4", // วิดีโอ 1
-            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4", // วิดีโอ 2
-            "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"                   // วิดีโอ 3
+            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
+            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
+            "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
         ];
 
-        // สุ่มตัวเลข 0 ถึง 2 เพื่อเลือกวิดีโอ
+        // สุ่มเลือกวิดีโอ
         const randomIndex = Math.floor(Math.random() * videoUrls.length);
-        const selectedVideo = videoUrls[randomIndex];
+        // เพิ่ม ?t= ด้านหลังเพื่อบังคับให้เบราว์เซอร์ไม่จำแคชและยอมเปลี่ยนวิดีโอใหม่ทุกครั้ง
+        const selectedVideo = videoUrls[randomIndex] + "?t=" + new Date().getTime();
 
-        // ใส่ลิงก์ที่สุ่มได้เข้าไปในแท็ก video และสั่งให้โหลดใหม่
+        // บังคับเปลี่ยน src ที่ตัว video โดยตรง
         const videoEl = document.getElementById('video-background');
-        const sourceEl = document.getElementById('video-source');
-        sourceEl.src = selectedVideo;
-        videoEl.load(); // สั่งให้วิดีโอโหลดซอร์สใหม่และเล่นอัตโนมัติ
+        videoEl.src = selectedVideo;
+        
+        // สั่งให้อุปกรณ์เล่นวิดีโอทันที
+        videoEl.load();
+        videoEl.play().catch(function(error) {
+            console.log("Autoplay ติดนโยบายเบราว์เซอร์ แต่ถูกจัดการแล้ว:", error);
+        });
 
-        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ (Admin / @Admin) ---
+        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ ---
         document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
