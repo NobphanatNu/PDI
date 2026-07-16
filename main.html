@@ -156,35 +156,42 @@ h2 {
 </head>
 <body>
 
-    <!-- มัดรวมก้อนนี้ไปวางต่อท้าย body ทันที -->
+    <!-- ปุ่มออกจากระบบ (ไม่ต้องเปลี่ยน) -->
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+
+    <!-- ก๊อปปี้ style ชุดใหม่นี้ไปวางแทนที่ style อันเก่าครับ -->
     <style>
         .btn-logout {
-            padding: 8px 18px;
+            padding: 6px 14px;
             background-color: #e53e3e;
             color: white;
-            border: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
             border-radius: 6px;
             font-family: 'Sarabun', sans-serif;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(229, 62, 62, 0.2);
-            /* แนะนำให้เพิ่ม 3 บรรทัดนี้เพื่อให้ปุ่มลอยเด่นอยู่มุมบนขวา ไม่รบกวนเนื้อหาอื่น */
-            position: absolute;
-            top: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            
+            /* จัดให้อยู่ขวาบนสุดเหนือทุกสิ่ง */
+            position: fixed;
+            top: 15px;
             right: 20px;
+            z-index: 99999;
         }
+
         .btn-logout:hover {
             background-color: #c53030;
-            box-shadow: 0 4px 6px rgba(197, 48, 48, 0.3);
             transform: translateY(-1px);
         }
+
         .btn-logout:active {
             transform: translateY(0);
         }
     </style>
+
+    <!-- โค้ดเนื้อหาเว็บเดิมของคุณ... -->
 
     <!-- จากตรงนี้จะเป็นโค้ดเนื้อหาเดิมของหน้าเว็บคุณ... -->
 
