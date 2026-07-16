@@ -44,7 +44,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.3);
+            background-color: rgba(0, 0, 0, 0.35);
             z-index: -99;
         }
 
@@ -162,9 +162,9 @@
 </head>
 <body>
 
-    <!-- เล่นวิดีโอพื้นหลัง (MG Cyberster) -->
+    <!-- เล่นวิดีโอพื้นหลัง (เริ่มต้นจะเป็นค่าว่าง แล้วใช้ JS ด้านล่างใส่ลิงก์สุ่มให้ครับ) -->
     <video autoplay loop muted playsinline id="video-background">
-        <source src="https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4" type="video/mp4">
+        <source id="video-source" src="" type="video/mp4">
         เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอพื้นหลัง
     </video>
 
@@ -196,6 +196,24 @@
     </div>
 
     <script>
+        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง ---
+        const videoUrls = [
+            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4", // วิดีโอ 1
+            "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4", // วิดีโอ 2
+            "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"                   // วิดีโอ 3
+        ];
+
+        // สุ่มตัวเลข 0 ถึง 2 เพื่อเลือกวิดีโอ
+        const randomIndex = Math.floor(Math.random() * videoUrls.length);
+        const selectedVideo = videoUrls[randomIndex];
+
+        // ใส่ลิงก์ที่สุ่มได้เข้าไปในแท็ก video และสั่งให้โหลดใหม่
+        const videoEl = document.getElementById('video-background');
+        const sourceEl = document.getElementById('video-source');
+        sourceEl.src = selectedVideo;
+        videoEl.load(); // สั่งให้วิดีโอโหลดซอร์สใหม่และเล่นอัตโนมัติ
+
+        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ (Admin / @Admin) ---
         document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -203,21 +221,18 @@
             const passVal = document.getElementById('password').value;
             const errorAlert = document.getElementById('errorAlert');
 
-            // ตรวจสอบข้อมูลจำลองตามที่คุณกำหนด (Admin / @Admin)
             if (userVal === "Admin" && passVal === "@Admin") {
                 errorAlert.style.display = 'none';
                 sessionStorage.setItem('isLoggedIn', 'true');
-                // เปลี่ยนหน้าไปที่ไฟล์เนื้อหาเดิม
                 window.location.href = 'main.html';
             } else {
                 errorAlert.style.display = 'block';
-                // เอฟเฟกต์สั่นกล่องเมื่อรหัสผิด
                 document.querySelector('.login-card').style.animation = "shake 0.3s";
                 setTimeout(() => { document.querySelector('.login-card').style.animation = ""; }, 300);
             }
         });
 
-        // ใส่เอฟเฟกต์สั่นสไตล์โมเดิร์น
+        // เอฟเฟกต์กล่องสั่นเมื่อกรอกรหัสผิด
         const styleSheet = document.styleSheets[0];
         styleSheet.insertRule(`
             @keyframes shake {
