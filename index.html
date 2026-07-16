@@ -5,153 +5,230 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>เข้าสู่ระบบ - ระบบจัดการอุปกรณ์รถ</title>
     
-    <!-- นำเข้าฟอนต์ Sarabun ให้เหมือนหน้าเว็บเดิมของคุณ -->
+    <!-- นำเข้าฟอนต์ Sarabun -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
+        /* --- Reset & Base Styles --- */
         * {
             box-sizing: border-box;
             font-family: 'Sarabun', sans-serif;
+            margin: 0;
+            padding: 0;
         }
 
-        body {
-            background-color: #f4f6f9;
-            margin: 0;
+        body, html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        /* --- วิดีโอพื้นหลังแบบเต็มจอ --- */
+        #video-background {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100;
+            object-fit: cover;
+        }
+
+        /* --- แผ่นสีดำโปร่งแสงช่วยให้เห็นตัวหนังสือชัดขึ้น --- */
+        .video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.3);
+            z-index: -99;
+        }
+
+        /* --- ตัวจัดกึ่งกลางหน้าจอ --- */
+        .login-page-wrapper {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 100%;
+            position: relative;
+            z-index: 1;
         }
 
+        /* --- กล่อง Login โปร่งใส (Glassmorphism) --- */
         .login-card {
-            background: #ffffff;
-            padding: 40px 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 50px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 400px;
-            border: 1px solid #e2e8f0;
+            max-width: 420px;
             text-align: center;
         }
 
         .login-header h2 {
             margin: 0 0 10px 0;
             color: #1a202c;
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 26px;
+            font-weight: 700;
         }
 
         .login-header p {
-            margin: 0 0 30px 0;
-            color: #718096;
-            font-size: 14px;
+            margin: 0 0 35px 0;
+            color: #2d3748;
+            font-size: 15px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             text-align: left;
         }
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
-            color: #4a5568;
+            margin-bottom: 10px;
+            color: #1a202c;
             font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* --- ช่องกรอกข้อมูลแบบโปร่งแสง --- */
+        .form-group input {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            color: #1a202c;
             font-weight: 500;
         }
 
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.2s;
-            outline: none;
+        .form-group input::placeholder {
+            color: #4a5568;
         }
 
         .form-group input:focus {
+            background: rgba(255, 255, 255, 0.9);
             border-color: #3182ce;
-            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.15);
+            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
         }
 
+        /* --- ปุ่มเข้าสู่ระบบ --- */
         .btn-login {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: #3182ce;
             color: white;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
             margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);
         }
 
         .btn-login:hover {
             background-color: #2b6cb0;
         }
 
+        .btn-login:active {
+            transform: translateY(1px);
+        }
+
+        /* --- กล่องแจ้งเตือนเมื่อรหัสผิด --- */
         .error-msg {
             color: #e53e3e;
             font-size: 14px;
-            margin-top: 15px;
+            margin-top: 20px;
             display: none;
-            background: #fff5f5;
-            padding: 10px;
-            border-radius: 6px;
+            background: rgba(255, 245, 245, 0.9);
+            padding: 12px;
+            border-radius: 8px;
             border: 1px solid #fed7d7;
+            font-weight: 500;
         }
     </style>
 </head>
 <body>
 
-<div class="login-card">
-    <div class="login-header">
-        <h2>ระบบจัดการอุปกรณ์รถ</h2>
-        <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+    <!-- เล่นวิดีโอพื้นหลัง (MG Cyberster) -->
+    <video autoplay loop muted playsinline id="video-background">
+        <source src="https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4" type="video/mp4">
+        เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอพื้นหลัง
+    </video>
+
+    <div class="video-overlay"></div>
+
+    <div class="login-page-wrapper">
+        <div class="login-card">
+            <div class="login-header">
+                <h2>ระบบจัดการอุปกรณ์รถ</h2>
+                <p>กรุณาเข้าสู่ระบบเพื่อดำเนินการต่อ</p>
+            </div>
+
+            <form id="mockLoginForm">
+                <div class="form-group">
+                    <label for="username">ชื่อผู้ใช้งาน</label>
+                    <input type="text" id="username" placeholder="ระบุชื่อผู้ใช้งาน" required autocomplete="off">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน</label>
+                    <input type="password" id="password" placeholder="ระบุรหัสผ่าน" required>
+                </div>
+
+                <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
+                
+                <div id="errorAlert" class="error-msg">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง!</div>
+            </form>
+        </div>
     </div>
 
-    <form id="mockLoginForm">
-        <div class="form-group">
-            <label for="username">ชื่อผู้ใช้งาน</label>
-            <input type="text" id="username" placeholder="ระบุ Username" required autocomplete="off">
-        </div>
-        
-        <div class="form-group">
-            <label for="password">รหัสผ่าน</label>
-            <input type="password" id="password" placeholder="ระบุ Password" required>
-        </div>
+    <script>
+        document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userVal = document.getElementById('username').value;
+            const passVal = document.getElementById('password').value;
+            const errorAlert = document.getElementById('errorAlert');
 
-        <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
-        
-        <!-- ข้อความแจ้งเตือนเมื่อรหัสผิด -->
-        <div id="errorAlert" class="error-msg">ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง!</div>
-    </form>
-</div>
+            // ตรวจสอบข้อมูลจำลองตามที่คุณกำหนด (Admin / @Admin)
+            if (userVal === "Admin" && passVal === "@Admin") {
+                errorAlert.style.display = 'none';
+                sessionStorage.setItem('isLoggedIn', 'true');
+                // เปลี่ยนหน้าไปที่ไฟล์เนื้อหาเดิม
+                window.location.href = 'main.html';
+            } else {
+                errorAlert.style.display = 'block';
+                // เอฟเฟกต์สั่นกล่องเมื่อรหัสผิด
+                document.querySelector('.login-card').style.animation = "shake 0.3s";
+                setTimeout(() => { document.querySelector('.login-card').style.animation = ""; }, 300);
+            }
+        });
 
-<script>
-    document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
-        e.preventDefault(); // ป้องกันการรีเฟรชหน้าจอ
-        
-        const userVal = document.getElementById('username').value;
-        const passVal = document.getElementById('password').value;
-        const errorAlert = document.getElementById('errorAlert');
-
-        // ตรวจสอบข้อมูลแบบจำลองตามที่กำหนด
-        if (userVal === "Admin" && passVal === "@Admin") {
-            errorAlert.style.display = 'none';
-            // วิ่งไปที่หน้าเนื้อหาเดิมที่คุณเปลี่ยนชื่อเป็น main.html ไว้
-            window.location.href = 'main.html';
-        } else {
-            // แสดงเตือนถ้ากรอกผิด
-            errorAlert.style.display = 'block';
-        }
-    });
-</script>
+        // ใส่เอฟเฟกต์สั่นสไตล์โมเดิร์น
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(`
+            @keyframes shake {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-6px); }
+                50% { transform: translateX(6px); }
+                75% { transform: translateX(-6px); }
+                100% { transform: translateX(0); }
+            }
+        `, styleSheet.cssRules.length);
+    </script>
 
 </body>
 </html>
