@@ -101,19 +101,20 @@ body {
   transform: translateY(-1px);
 }
 
-/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลาง (Layout) ===== */
+/* ===== ส่วนควบคุมเนื้อหาหลัก ล็อกทิศทางจาก ซ้าย ไป ขวา (Row) ===== */
 .container {
   margin-top: 70px;
   height: calc(100vh - 70px);
   width: 100%;
-  max-width: 1000px; /* บีบความกว้างลงมาหน่อยเพื่อให้ 2 กล่องเมนูดูสวยพอดี */
+  max-width: 1000px; /* คุมความกว้างไม่ให้หลุดกระจายตัวเกินไป */
   margin-left: auto;
   margin-right: auto;
   display: flex;
-  align-items: center; /* จัดให้อยู่กึ่งกลางหน้าจอในแนวตั้ง */
-  justify-content: center; /* จัดให้อยู่กึ่งกลางหน้าจอในแนวนอน */
-  padding: 15px;
-  gap: 30px; /* เพิ่มระยะห่างระหว่าง 2 กล่องฟังก์ชั่น */
+  flex-direction: row; /* ⬅️ บังคับเรียงตัวแนวระนาบจากซ้ายไปขวา */
+  align-items: center; /* จัดให้เนื้อหาอยู่กึ่งกลางแนวตั้ง */
+  justify-content: center; /* จัดให้เนื้อหาอยู่กึ่งกลางแนวนอน */
+  padding: 20px;
+  gap: 30px; /* ระยะห่างระหว่างกล่องฟังก์ชั่น */
   position: relative;
   z-index: 1;
 }
@@ -121,10 +122,10 @@ body {
 /* ===== คอลัมน์สไตล์กระจกใส โค้งมน เหมือนหน้าหลัก ===== */
 .column-menu {
   flex: 1;
-  max-width: 400px;
+  max-width: 420px;
   display: flex;
   flex-direction: column;
-  padding: 25px;
+  padding: 30px 25px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.25) !important;
@@ -156,6 +157,7 @@ h2 {
   color: #333;
   margin-bottom: 25px;
   line-height: 1.5;
+  height: 45px; /* ล็อกความสูงคำอธิบายเพื่อให้ปุ่มด้านล่างอยู่ในระดับเท่ากันเป๊ะ */
 }
 
 /* ===== ปุ่มฟังก์ชั่นสไตล์เดียวกับไอเท็มปุ่มก๊อปปี้แต่ปรับให้เด่นขึ้น ===== */
@@ -174,11 +176,11 @@ h2 {
 }
 
 .column-menu:hover .menu-btn {
-  background: rgba(257, 232, 255, 1) !important; /* เตรียมสีไฮไลท์เบาๆ ตอนเอาเมาส์วางบนกล่อง */
+  background: rgba(257, 232, 255, 1) !important;
 }
 
 .menu-btn:hover {
-  background: #2f96ec !important; /* เปลี่ยนเป็นสีฟ้าไฮไลท์เมื่อเอาเมาส์ชี้โดยตรง */
+  background: #2f96ec !important;
   color: #fff !important;
   border-color: #2f96ec;
   box-shadow: 0 0 15px rgba(47, 150, 236, 0.6);
@@ -205,20 +207,20 @@ h2 {
         </div>
     </div>
 
-    <!-- กล่องเลือกฟังก์ชั่นสไตล์กระจกใส -->
+    <!-- กล่องเลือกฟังก์ชั่นจัดเรียงจากซ้ายไปขวาอย่างเป็นระเบียบ -->
     <div class="container">
 
-        <!-- คอลัมน์ฟังก์ชั่นที่ 1 -->
+        <!-- ฟังก์ชั่นที่ 1 (ฝั่งซ้าย) -->
         <div class="column-menu">
             <h2>🚗 อุปกรณ์ตกแต่ง</h2>
-            <div class="menu-desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ งานพื้นฐาน เทคโนโลยี และระบบไฟฟ้าทั่วไป</div>
+            <div class="menu-desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ และงานพื้นฐานทั่วไป</div>
             <button class="menu-btn" onclick="location.href='main.html'">เปิดใช้งานฟังก์ชั่น</button>
         </div>
 
-        <!-- คอลัมน์ฟังก์ชั่นที่ 2 -->
+        <!-- ฟังก์ชั่นที่ 2 (ฝั่งขวา) -->
         <div class="column-menu">
             <h2>🔧 อะไหล่เช็กระยะ</h2>
-            <div class="menu-desc">ระบบคัดลอกรายการของเหลว ชิ้นส่วนสิ้นเปลือง และรายการบำรุงรักษาตามรอบระยะทาง</div>
+            <div class="menu-desc">ระบบคัดลอกรายการของเหลว และบำรุงรักษาตามรอบระยะทาง</div>
             <button class="menu-btn" onclick="location.href='maintenance.html'">เปิดใช้งานฟังก์ชั่น</button>
         </div>
 
