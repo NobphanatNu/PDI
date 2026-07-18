@@ -1,201 +1,266 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>รายการอุปกรณ์รถ MG - Accessory Copy Tool</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: #717171; /* พื้นหลังสีเทาเข้มแบบดีไซน์เดิมของคุณ */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://listofcaraccessories.vercel.app/main.html'); /* จำลองภาพพื้นหลังลางๆ */
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+<meta charset="UTF-8">
+<title>เลือกฟังก์ชั่นการใช้งาน - Accessory Copy Tool</title>
 
-        /* Navbar ด้านบนสีแดง ABLE */
-        .header-bar {
-            background-color: #e50914;
-            color: white;
-            width: 100%;
-            padding: 12px 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-sizing: border-box;
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
+  
+/* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
+* {
+  box-sizing: border-box;
+}
 
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+body {
+  font-family: 'Sarabun', Arial, sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: transparent !important;
+  overflow: hidden;
+  font-size: 16px;
+}
 
-        /* จำลองกรอบโลโก้ ABLE */
-        .logo-box {
-            background-color: white;
-            color: black;
-            font-weight: 900;
-            padding: 4px 12px;
-            font-size: 20px;
-            letter-spacing: 2px;
-            border-radius: 2px;
-            text-shadow: none;
-        }
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
 
-        .title-text {
-            display: flex;
-            flex-direction: column;
-        }
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25); /* ฟิล์มดำบางๆ ช่วยให้ตัวอักษรอ่านง่ายขึ้น */
+  z-index: -1;
+}
 
-        .main-title {
-            font-size: 22px;
-            font-weight: bold;
-        }
+/* ===== แถบด้านบน (Top Bar) ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(90deg, #d90000, #ff2d2d);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.25);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+}
 
-        .sub-title {
-            font-size: 12px;
-            opacity: 0.9;
-        }
+.topbar img {
+  width: 120px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+}
 
-        /* ปุ่มออกจากระบบมุมขวาบน */
-        .logout-btn {
-            background-color: #e50914;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 6px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: background 0.2s;
-        }
+.topbar h1 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+}
 
-        .logout-btn:hover {
-            background-color: #b8070f;
-        }
+.topbar span {
+  color: #ffe9e9;
+  font-size: 14px;
+  display: block;
+}
 
-        /* ส่วนจัดวางการ์ดเมนูตรงกลาง */
-        .menu-container {
-            display: flex;
-            gap: 25px;
-            margin-top: 150px; /* เว้นระยะลงมาจาก Header */
-            padding: 20px;
-            width: 100%;
-            max-width: 900px;
-            box-sizing: border-box;
-            justify-content: center;
-        }
+/* ===== ปุ่มกลับหน้าหลัก/ออกจากระบบ ด้านขวาบน ===== */
+.btn-logout {
+  padding: 6px 14px;
+  background-color: #e53e3e;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  z-index: 99999;
+}
 
-        /* กล่องสีเทาครอบแบบคอลัมน์ของเดิม */
-        .function-card {
-            flex: 1;
-            background-color: rgba(211, 211, 211, 0.95); /* สีเทาอ่อน d3d3d3 แบบหน้าหลัก */
-            border-radius: 12px;
-            padding: 30px 20px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: transform 0.2s, box-shadow 0.2s;
-            max-width: 380px;
-        }
+.btn-logout:hover {
+  background-color: #c53030;
+  transform: translateY(-1px);
+}
 
-        .function-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-        }
+/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลาง (Layout) ===== */
+.container {
+  margin-top: 70px;
+  height: calc(100vh - 70px);
+  width: 100%;
+  max-width: 1000px; /* บีบความกว้างลงมาหน่อยเพื่อให้ 2 กล่องเมนูดูสวยพอดี */
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  align-items: center; /* จัดให้อยู่กึ่งกลางหน้าจอในแนวตั้ง */
+  justify-content: center; /* จัดให้อยู่กึ่งกลางหน้าจอในแนวนอน */
+  padding: 15px;
+  gap: 30px; /* เพิ่มระยะห่างระหว่าง 2 กล่องฟังก์ชั่น */
+  position: relative;
+  z-index: 1;
+}
 
-        .card-header {
-            font-size: 18px;
-            font-weight: bold;
-            color: #333;
-            margin-bottom: 25px;
-            border-bottom: 2px solid rgba(0,0,0,0.1);
-            padding-bottom: 10px;
-        }
+/* ===== คอลัมน์สไตล์กระจกใส โค้งมน เหมือนหน้าหลัก ===== */
+.column-menu {
+  flex: 1;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  text-align: center;
+  transition: all 0.3s ease;
+}
 
-        /* ปุ่มเลือกฟังก์ชั่นทรงแคปซูลมนๆ เหมือนรายการอะไหล่เดิม */
-        .action-button {
-            background-color: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            padding: 15px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            width: 100%;
-            box-sizing: border-box;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
+.column-menu:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.4);
+}
 
-        .action-button:hover {
-            background-color: #e50914;
-            color: white;
-            border-color: #e50914;
-            transform: scale(1.02);
-        }
+/* ===== กล่องข้อความหัวข้อด้านใน ===== */
+h2 {
+  font-family: 'Sarabun', Arial, sans-serif;
+  font-size: 22px;
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #111;
+  font-weight: 700;
+}
 
-        .card-desc {
-            font-size: 13px;
-            color: #666;
-            margin-top: 15px;
-            line-height: 1.4;
-        }
-    </style>
+.menu-desc {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 25px;
+  line-height: 1.5;
+}
+
+/* ===== ปุ่มฟังก์ชั่นสไตล์เดียวกับไอเท็มปุ่มก๊อปปี้แต่ปรับให้เด่นขึ้น ===== */
+.menu-btn {
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Sarabun', Arial, sans-serif;
+  font-size: 17px;
+  font-weight: bold;
+  color: #222;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.column-menu:hover .menu-btn {
+  background: rgba(257, 232, 255, 1) !important; /* เตรียมสีไฮไลท์เบาๆ ตอนเอาเมาส์วางบนกล่อง */
+}
+
+.menu-btn:hover {
+  background: #2f96ec !important; /* เปลี่ยนเป็นสีฟ้าไฮไลท์เมื่อเอาเมาส์ชี้โดยตรง */
+  color: #fff !important;
+  border-color: #2f96ec;
+  box-shadow: 0 0 15px rgba(47, 150, 236, 0.6);
+  transform: scale(1.03);
+}
+</style>
+
 </head>
 <body>
 
-    <!-- แถบ Header สีแดงตามธีม ABLE -->
-    <div class="header-bar">
-        <div class="brand-section">
-            <div class="logo-box">ABLE</div>
-            <div class="title-text">
-                <span class="main-title">รายการอุปกรณ์รถ MG</span>
-                <span class="sub-title">Accessory Copy Tool</span>
-            </div>
+    <!-- ปุ่มออกจากระบบกลับไปหน้า Login -->
+    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+
+    <!-- วิดีโอพื้นหลังเล่นต่อเนื่องแบบสุ่ม/วนลูป เหมือนหน้าหลัก -->
+    <video id="bg-video" autoplay muted playsinline></video>
+    <div class="video-overlay"></div>
+
+    <!-- แถบเมนูด้านบนสีแดงแบรนด์ ABLE -->
+    <div class="topbar">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
+        <div>
+            <h1>รายการอุปกรณ์รถ MG</h1>
+            <span>Accessory Copy Tool</span>
         </div>
-        <button class="logout-btn" onclick="location.href='index.html'">ออกจากระบบ</button>
     </div>
 
-    <!-- กล่องเลือกฟังก์ชั่นสไตล์คอลัมน์เดิม -->
-    <div class="menu-container">
-        
-        <!-- ฟังก์ชั่นที่ 1 -->
-        <div class="function-card">
-            <div class="card-header">⚙️ หมวดหมู่อุปกรณ์ตกแต่ง</div>
-            <button class="action-button" onclick="location.href='main.html'">
-                🚗 รายการอุปกรณ์ตกแต่ง
-            </button>
-            <div class="card-desc">ระบบจัดการ คัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ และงานพื้นฐานทั่วไป</div>
+    <!-- กล่องเลือกฟังก์ชั่นสไตล์กระจกใส -->
+    <div class="container">
+
+        <!-- คอลัมน์ฟังก์ชั่นที่ 1 -->
+        <div class="column-menu">
+            <h2>🚗 อุปกรณ์ตกแต่ง</h2>
+            <div class="menu-desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ งานพื้นฐาน เทคโนโลยี และระบบไฟฟ้าทั่วไป</div>
+            <button class="menu-btn" onclick="location.href='main.html'">เปิดใช้งานฟังก์ชั่น</button>
         </div>
 
-        <!-- ฟังก์ชั่นที่ 2 -->
-        <div class="function-card">
-            <div class="card-header">📅 หมวดหมู่บำรุงรักษา</div>
-            <button class="action-button" onclick="location.href='maintenance.html'">
-                🔧 รายการอะไหล่เช็กระยะ
-            </button>
-            <div class="card-desc">ระบบจัดการข้อมูล คัดลอกชุดรายการอะไหล่สิ้นเปลือง และของเหลวตามรอบระยะทาง</div>
+        <!-- คอลัมน์ฟังก์ชั่นที่ 2 -->
+        <div class="column-menu">
+            <h2>🔧 อะไหล่เช็กระยะ</h2>
+            <div class="menu-desc">ระบบคัดลอกรายการของเหลว ชิ้นส่วนสิ้นเปลือง และรายการบำรุงรักษาตามรอบระยะทาง</div>
+            <button class="menu-btn" onclick="location.href='maintenance.html'">เปิดใช้งานฟังก์ชั่น</button>
         </div>
 
     </div>
+
+<!-- JavaScript สำหรับควบคุมวิดีโอพื้นหลังและปุ่ม Log out -->
+<script>
+const videoSources = [
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
+  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
+];
+
+let currentVideoIndex = 0;
+const videoPlayer = document.getElementById("bg-video");
+
+function playNextVideo() {
+  if (!videoPlayer || videoSources.length === 0) return;
+  
+  videoPlayer.src = videoSources[currentVideoIndex];
+  videoPlayer.load();
+  
+  videoPlayer.play().catch(err => {
+    console.log("วิดีโอโหลดไม่สำเร็จ กำลังข้ามไปตัวถัดไป...", err);
+    setTimeout(playNextVideo, 1000); 
+  });
+  
+  currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+}
+
+if (videoPlayer) {
+  videoPlayer.addEventListener("ended", playNextVideo);
+  videoPlayer.addEventListener("error", playNextVideo);
+}
+
+window.addEventListener("DOMContentLoaded", playNextVideo);
+
+// สั่งการเมื่อมีการกดปุ่มออกจากระบบ
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    window.location.href = 'index.html';
+});
+</script>
 
 </body>
 </html>
