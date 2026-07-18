@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ABLE - เลือกฟังก์ชั่นการใช้งาน</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .header {
+            background-color: #e50914; /* สีแดงแบบโลโก้ ABLE */
+            color: white;
+            width: 100%;
+            padding: 20px 0;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            position: absolute;
+            top: 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .menu-container {
+            display: flex;
+            gap: 30px;
+            max-width: 900px;
+            width: 90%;
+            margin-top: 60px;
+        }
+        .menu-card {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        .menu-card:hover {
+            transform: translateY(-5px);
+            border-color: #e50914;
+            box-shadow: 0 12px 20px rgba(229, 9, 20, 0.2);
+        }
+        .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+        .title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .desc {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        ABLE - Accessory Copy Tool
+    </div>
+
+    <div class="menu-container">
+        <!-- ปุ่มฟังก์ชั่นที่ 1 -->
+        <div class="menu-card" onclick="location.href='main.html'">
+            <div class="icon">🚗</div>
+            <div class="title">รายการอุปกรณ์ตกแต่ง</div>
+            <div class="desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์และงานพื้นฐาน</div>
+        </div>
+
+        <!-- ปุ่มฟังก์ชั่นที่ 2 -->
+        <div class="menu-card" onclick="location.href='maintenance.html'">
+            <div class="icon">🔧</div>
+            <div class="title">รายการอะไหล่เช็กระยะ</div>
+            <div class="desc">ระบบคัดลอกรายการอะไหล่และของเหลวตามรอบเช็กระยะ</div>
+        </div>
+    </div>
+
+</body>
+</html>
