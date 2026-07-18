@@ -229,7 +229,7 @@
             if (userVal === "Admin" && passVal === "@Admin") {
                 errorAlert.style.display = 'none';
                 sessionStorage.setItem('isLoggedIn', 'true');
-                window.location.href = 'main.html';
+                window.location.href = "menu.html";
             } else {
                 errorAlert.style.display = 'block';
                 document.querySelector('.login-card').style.animation = "shake 0.3s";
