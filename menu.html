@@ -3,90 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ABLE - เลือกฟังก์ชั่นการใช้งาน</title>
+    <title>รายการอุปกรณ์รถ MG - Accessory Copy Tool</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f4f4;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #717171; /* พื้นหลังสีเทาเข้มแบบดีไซน์เดิมของคุณ */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('https://listofcaraccessories.vercel.app/main.html'); /* จำลองภาพพื้นหลังลางๆ */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
             margin: 0;
             padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
         }
-        .header {
-            background-color: #e50914; /* สีแดงแบบโลโก้ ABLE */
+
+        /* Navbar ด้านบนสีแดง ABLE */
+        .header-bar {
+            background-color: #e50914;
             color: white;
             width: 100%;
-            padding: 20px 0;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            position: absolute;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            position: fixed;
             top: 0;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            left: 0;
+            z-index: 1000;
         }
+
+        .brand-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* จำลองกรอบโลโก้ ABLE */
+        .logo-box {
+            background-color: white;
+            color: black;
+            font-weight: 900;
+            padding: 4px 12px;
+            font-size: 20px;
+            letter-spacing: 2px;
+            border-radius: 2px;
+            text-shadow: none;
+        }
+
+        .title-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-title {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .sub-title {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        /* ปุ่มออกจากระบบมุมขวาบน */
+        .logout-btn {
+            background-color: #e50914;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            padding: 6px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #b8070f;
+        }
+
+        /* ส่วนจัดวางการ์ดเมนูตรงกลาง */
         .menu-container {
             display: flex;
-            gap: 30px;
+            gap: 25px;
+            margin-top: 150px; /* เว้นระยะลงมาจาก Header */
+            padding: 20px;
+            width: 100%;
             max-width: 900px;
-            width: 90%;
-            margin-top: 60px;
+            box-sizing: border-box;
+            justify-content: center;
         }
-        .menu-card {
+
+        /* กล่องสีเทาครอบแบบคอลัมน์ของเดิม */
+        .function-card {
             flex: 1;
-            background: white;
+            background-color: rgba(211, 211, 211, 0.95); /* สีเทาอ่อน d3d3d3 แบบหน้าหลัก */
             border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-            padding: 40px 20px;
+            padding: 30px 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
             text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: transform 0.2s, box-shadow 0.2s;
+            max-width: 380px;
         }
-        .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: #e50914;
-            box-shadow: 0 12px 20px rgba(229, 9, 20, 0.2);
+
+        .function-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
         }
-        .icon {
-            font-size: 50px;
-            margin-bottom: 20px;
-        }
-        .title {
-            font-size: 20px;
+
+        .card-header {
+            font-size: 18px;
             font-weight: bold;
             color: #333;
-            margin-bottom: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+            padding-bottom: 10px;
         }
-        .desc {
+
+        /* ปุ่มเลือกฟังก์ชั่นทรงแคปซูลมนๆ เหมือนรายการอะไหล่เดิม */
+        .action-button {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            width: 100%;
+            box-sizing: border-box;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .action-button:hover {
+            background-color: #e50914;
+            color: white;
+            border-color: #e50914;
+            transform: scale(1.02);
+        }
+
+        .card-desc {
+            font-size: 13px;
             color: #666;
-            font-size: 14px;
+            margin-top: 15px;
+            line-height: 1.4;
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        ABLE - Accessory Copy Tool
+    <!-- แถบ Header สีแดงตามธีม ABLE -->
+    <div class="header-bar">
+        <div class="brand-section">
+            <div class="logo-box">ABLE</div>
+            <div class="title-text">
+                <span class="main-title">รายการอุปกรณ์รถ MG</span>
+                <span class="sub-title">Accessory Copy Tool</span>
+            </div>
+        </div>
+        <button class="logout-btn" onclick="location.href='index.html'">ออกจากระบบ</button>
     </div>
 
+    <!-- กล่องเลือกฟังก์ชั่นสไตล์คอลัมน์เดิม -->
     <div class="menu-container">
-        <!-- ปุ่มฟังก์ชั่นที่ 1 -->
-        <div class="menu-card" onclick="location.href='main.html'">
-            <div class="icon">🚗</div>
-            <div class="title">รายการอุปกรณ์ตกแต่ง</div>
-            <div class="desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์และงานพื้นฐาน</div>
+        
+        <!-- ฟังก์ชั่นที่ 1 -->
+        <div class="function-card">
+            <div class="card-header">⚙️ หมวดหมู่อุปกรณ์ตกแต่ง</div>
+            <button class="action-button" onclick="location.href='main.html'">
+                🚗 รายการอุปกรณ์ตกแต่ง
+            </button>
+            <div class="card-desc">ระบบจัดการ คัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ และงานพื้นฐานทั่วไป</div>
         </div>
 
-        <!-- ปุ่มฟังก์ชั่นที่ 2 -->
-        <div class="menu-card" onclick="location.href='maintenance.html'">
-            <div class="icon">🔧</div>
-            <div class="title">รายการอะไหล่เช็กระยะ</div>
-            <div class="desc">ระบบคัดลอกรายการอะไหล่และของเหลวตามรอบเช็กระยะ</div>
+        <!-- ฟังก์ชั่นที่ 2 -->
+        <div class="function-card">
+            <div class="card-header">📅 หมวดหมู่บำรุงรักษา</div>
+            <button class="action-button" onclick="location.href='maintenance.html'">
+                🔧 รายการอะไหล่เช็กระยะ
+            </button>
+            <div class="card-desc">ระบบจัดการข้อมูล คัดลอกชุดรายการอะไหล่สิ้นเปลือง และของเหลวตามรอบระยะทาง</div>
         </div>
+
     </div>
 
 </body>
