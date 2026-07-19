@@ -10,6 +10,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
+    <!-- ไอคอนสำหรับช่องกรอกข้อมูล (จากแบบแรกที่ต้องการ) -->
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
     <style>
         /* --- Reset & Base Styles --- */
         * {
@@ -44,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.35);
+            background-color: rgba(0, 0, 0, 0.4);
             z-index: -99;
         }
 
@@ -58,92 +62,117 @@
             z-index: 1;
         }
 
-        /* --- กล่อง Login โปร่งใส (Glassmorphism) --- */
+        /* --- ปรับโฉมกล่อง Login ใหม่ (สไตล์กระจกใสเบลอระดับพรีเมียม) --- */
         .login-card {
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             padding: 50px 40px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 420px;
             text-align: center;
         }
 
         .login-header h2 {
-            margin: 0 0 10px 0;
-            color: #1a202c;
+            margin: 0 0 5px 0;
+            color: #ffffff;
             font-size: 26px;
-            font-weight: 700;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
 
         .login-header p {
-            margin: 0 0 35px 0;
-            color: #2d3748;
+            margin: 0 0 15px 0;
+            color: rgba(255, 255, 255, 0.8);
             font-size: 15px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
+        /* --- ปรับรูปแบบโครงสร้าง Form Group ใหม่ให้มีเส้นขีดล่างตามตัวอย่างแรก --- */
         .form-group {
-            margin-bottom: 25px;
+            position: relative;
+            width: 100%;
+            height: 50px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+            margin: 35px 0;
             text-align: left;
         }
 
+        /* จัดข้อความ Label ให้ลอยอยู่ตรงกลางช่องกรอกตอนแรก */
         .form-group label {
-            display: block;
-            margin-bottom: 10px;
-            color: #1a202c;
-            font-size: 14px;
+            position: absolute;
+            top: 50%;
+            left: 5px;
+            transform: translateY(-50%);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 500;
+            pointer-events: none;
+            transition: .4s ease;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* เมื่อคลิกหรือมีข้อมูลพิมพ์อยู่ จะดัน Label ขึ้นด้านบนและเปลี่ยนเป็นสีฟ้า */
+        .form-group input:focus ~ label,
+        .form-group input:valid ~ label {
+            top: -8px;
+            font-size: 13px;
+            color: #3b82f6;
             font-weight: 600;
         }
 
-        /* --- ช่องกรอกข้อมูลแบบโปร่งแสง --- */
+        /* ช่องอินพุตตัดขอบและพื้นหลังทึบออก ให้เหลือแค่ความโล่งโปร่งแสง */
         .form-group input {
             width: 100%;
-            padding: 14px 18px;
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            font-size: 15px;
-            transition: all 0.3s ease;
+            height: 100%;
+            background: transparent !important;
+            border: none;
             outline: none;
-            color: #1a202c;
+            font-size: 16px;
+            color: #ffffff !important;
             font-weight: 500;
+            padding: 0 35px 0 5px;
+            transition: all 0.3s ease;
+            box-shadow: none !important;
         }
 
-        .form-group input::placeholder {
-            color: #4a5568;
+        /* จัดตำแหน่งไอคอนให้อยู่ด้านขวาของแต่ละช่อง */
+        .form-group .icon {
+            position: absolute;
+            right: 8px;
+            font-size: 20px;
+            color: #ffffff;
+            top: 50%;
+            transform: translateY(-50%);
         }
 
-        .form-group input:focus {
-            background: rgba(255, 255, 255, 0.9);
-            border-color: #3182ce;
-            box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
-        }
-
-        /* --- ปุ่มเข้าสู่ระบบ --- */
+        /* --- ปุ่มเข้าสู่ระบบโทนสีฟ้าเดิม แต่เพิ่ม Effect ให้ลอยตัวโมเดิร์นขึ้น --- */
         .btn-login {
             width: 100%;
             padding: 14px;
-            background-color: #3182ce;
+            background-color: #3b82f6;
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
             margin-top: 10px;
-            box-shadow: 0 4px 6px rgba(49, 130, 206, 0.3);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
         .btn-login:hover {
-            background-color: #2b6cb0;
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
         }
 
         .btn-login:active {
-            transform: translateY(1px);
+            transform: translateY(0px);
         }
 
         /* --- กล่องแจ้งเตือนเมื่อรหัสผิด --- */
@@ -162,7 +191,7 @@
 </head>
 <body>
 
-    <!-- เล่นวิดีโอพื้นหลัง (เริ่มต้นจะเป็นค่าว่าง แล้วใช้ JS ด้านล่างใส่ลิงก์สุ่มให้ครับ) -->
+    <!-- เล่นวิดีโอพื้นหลังเดิมของคุณ -->
     <video autoplay loop muted playsinline id="video-background">
         <source id="video-source" src="" type="video/mp4">
         เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอพื้นหลัง
@@ -178,14 +207,18 @@
             </div>
 
             <form id="mockLoginForm">
+                <!-- เปลี่ยนดีไซน์ช่องกรอก Username เป็นรูปแบบอนิเมชันพร้อมไอคอนรูปคน -->
                 <div class="form-group">
+                    <input type="text" id="username" required autocomplete="off">
                     <label for="username">ชื่อผู้ใช้งาน</label>
-                    <input type="text" id="username" placeholder="ระบุชื่อผู้ใช้งาน" required autocomplete="off">
+                    <span class="icon"><ion-icon name="person"></ion-icon></span>
                 </div>
                 
+                <!-- เปลี่ยนดีไซน์ช่องกรอก Password เป็นรูปแบบอนิเมชันพร้อมไอคอนแม่กุญแจ -->
                 <div class="form-group">
+                    <input type="password" id="password" required>
                     <label for="password">รหัสผ่าน</label>
-                    <input type="password" id="password" placeholder="ระบุรหัสผ่าน" required>
+                    <span class="icon"><ion-icon name="lock-closed"></ion-icon></span>
                 </div>
 
                 <button type="submit" class="btn-login">เข้าสู่ระบบ</button>
@@ -196,29 +229,25 @@
     </div>
 
     <script>
-        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง (ปรับปรุงใหม่ให้สลับแน่นอน) ---
+        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง (คงระบบเดิมของคุณไว้) ---
         const videoUrls = [
             "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
             "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
             "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
         ];
 
-        // สุ่มเลือกวิดีโอ
         const randomIndex = Math.floor(Math.random() * videoUrls.length);
-        // เพิ่ม ?t= ด้านหลังเพื่อบังคับให้เบราว์เซอร์ไม่จำแคชและยอมเปลี่ยนวิดีโอใหม่ทุกครั้ง
         const selectedVideo = videoUrls[randomIndex] + "?t=" + new Date().getTime();
 
-        // บังคับเปลี่ยน src ที่ตัว video โดยตรง
         const videoEl = document.getElementById('video-background');
         videoEl.src = selectedVideo;
         
-        // สั่งให้อุปกรณ์เล่นวิดีโอทันที
         videoEl.load();
         videoEl.play().catch(function(error) {
             console.log("Autoplay ติดนโยบายเบราว์เซอร์ แต่ถูกจัดการแล้ว:", error);
         });
 
-        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ ---
+        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ (คงระบบเดิมของคุณไว้) ---
         document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -237,7 +266,7 @@
             }
         });
 
-        // เอฟเฟกต์กล่องสั่นเมื่อกรอกรหัสผิด
+        // เอฟเฟกต์กล่องสั่นเมื่อกรอกรหัสผิด (คงระบบเดิมของคุณไว้)
         const styleSheet = document.styleSheets[0];
         styleSheet.insertRule(`
             @keyframes shake {
