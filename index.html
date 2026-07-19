@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- ไอคอนสำหรับช่องกรอกข้อมูล (จากแบบแรกที่ต้องการ) -->
+    <!-- ไอคอนสำหรับช่องกรอกข้อมูล -->
     <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
 
@@ -48,7 +48,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            background-color: rgba(0, 0, 0, 0.45);
             z-index: -99;
         }
 
@@ -62,14 +62,14 @@
             z-index: 1;
         }
 
-        /* --- ปรับโฉมกล่อง Login ใหม่ (สไตล์กระจกใสเบลอระดับพรีเมียม) --- */
+        /* --- กล่อง Login สไตล์กระจกใสเบลอพรีเมียม --- */
         .login-card {
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             padding: 50px 40px;
             border-radius: 20px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
             width: 100%;
             max-width: 420px;
@@ -91,7 +91,7 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.5);
         }
 
-        /* --- ปรับรูปแบบโครงสร้าง Form Group ใหม่ให้มีเส้นขีดล่างตามตัวอย่างแรก --- */
+        /* --- ปรับโครงสร้าง Form Group แก้ไขการทับซ้อน --- */
         .form-group {
             position: relative;
             width: 100%;
@@ -101,7 +101,6 @@
             text-align: left;
         }
 
-        /* จัดข้อความ Label ให้ลอยอยู่ตรงกลางช่องกรอกตอนแรก */
         .form-group label {
             position: absolute;
             top: 50%;
@@ -109,13 +108,14 @@
             transform: translateY(-50%);
             color: #ffffff;
             font-size: 16px;
-            font-weight: 500;
+            font-weight: 400;
             pointer-events: none;
             transition: .4s ease;
             text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            z-index: 1;
         }
 
-        /* เมื่อคลิกหรือมีข้อมูลพิมพ์อยู่ จะดัน Label ขึ้นด้านบนและเปลี่ยนเป็นสีฟ้า */
+        /* แอนิเมชันดันภาษาไทยขึ้นเมื่อ focus หรือมีข้อมูล */
         .form-group input:focus ~ label,
         .form-group input:valid ~ label {
             top: -8px;
@@ -124,7 +124,7 @@
             font-weight: 600;
         }
 
-        /* ช่องอินพุตตัดขอบและพื้นหลังทึบออก ให้เหลือแค่ความโล่งโปร่งแสง */
+        /* แก้ปัญหาสีขาว/ฟ้าอัตโนมัติจากเบราว์เซอร์ (Autofill) และป้องกันตัวหนังสือทับไอคอน */
         .form-group input {
             width: 100%;
             height: 100%;
@@ -134,22 +134,34 @@
             font-size: 16px;
             color: #ffffff !important;
             font-weight: 500;
-            padding: 0 35px 0 5px;
+            padding: 0 35px 0 5px; /* เว้นระยะขวาไม่ให้พิมพ์ทับไอคอน */
             transition: all 0.3s ease;
             box-shadow: none !important;
+            position: relative;
+            z-index: 2;
         }
 
-        /* จัดตำแหน่งไอคอนให้อยู่ด้านขวาของแต่ละช่อง */
+        /* บังคับล้างเอฟเฟกต์สีกล่องของเบราว์เซอร์เวลาจำรหัสผ่าน */
+        .form-group input:-webkit-autofill,
+        .form-group input:-webkit-autofill:hover, 
+        .form-group input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #ffffff !important;
+            -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
+        /* จัดตำแหน่งไอคอน */
         .form-group .icon {
             position: absolute;
             right: 8px;
             font-size: 20px;
-            color: #ffffff;
+            color: rgba(255, 255, 255, 0.8);
             top: 50%;
             transform: translateY(-50%);
+            z-index: 1;
         }
 
-        /* --- ปุ่มเข้าสู่ระบบโทนสีฟ้าเดิม แต่เพิ่ม Effect ให้ลอยตัวโมเดิร์นขึ้น --- */
+        /* --- ปุ่มเข้าสู่ระบบโทนสีฟ้าโมเดิร์น --- */
         .btn-login {
             width: 100%;
             padding: 14px;
@@ -191,7 +203,7 @@
 </head>
 <body>
 
-    <!-- เล่นวิดีโอพื้นหลังเดิมของคุณ -->
+    <!-- เล่นวิดีโอพื้นหลังเดิม -->
     <video autoplay loop muted playsinline id="video-background">
         <source id="video-source" src="" type="video/mp4">
         เบราว์เซอร์ของคุณไม่รองรับการเล่นวิดีโอพื้นหลัง
@@ -207,14 +219,12 @@
             </div>
 
             <form id="mockLoginForm">
-                <!-- เปลี่ยนดีไซน์ช่องกรอก Username เป็นรูปแบบอนิเมชันพร้อมไอคอนรูปคน -->
                 <div class="form-group">
                     <input type="text" id="username" required autocomplete="off">
                     <label for="username">ชื่อผู้ใช้งาน</label>
                     <span class="icon"><ion-icon name="person"></ion-icon></span>
                 </div>
                 
-                <!-- เปลี่ยนดีไซน์ช่องกรอก Password เป็นรูปแบบอนิเมชันพร้อมไอคอนแม่กุญแจ -->
                 <div class="form-group">
                     <input type="password" id="password" required>
                     <label for="password">รหัสผ่าน</label>
@@ -229,7 +239,7 @@
     </div>
 
     <script>
-        // --- 1. ระบบมัดรวม 3 วิดีโอและทำการสุ่มพื้นหลัง (คงระบบเดิมของคุณไว้) ---
+        // --- ระบบสุ่มและเล่นวิดีโอพื้นหลัง 3 ตัว ---
         const videoUrls = [
             "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
             "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
@@ -244,10 +254,10 @@
         
         videoEl.load();
         videoEl.play().catch(function(error) {
-            console.log("Autoplay ติดนโยบายเบราว์เซอร์ แต่ถูกจัดการแล้ว:", error);
+            console.log("Autoplay ติดนโยบายเบราว์เซอร์:", error);
         });
 
-        // --- 2. ระบบเช็คสถานะการเข้าสู่ระบบ (คงระบบเดิมของคุณไว้) ---
+        // --- ระบบตรวจสอบ Username & Password ---
         document.getElementById('mockLoginForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -266,7 +276,7 @@
             }
         });
 
-        // เอฟเฟกต์กล่องสั่นเมื่อกรอกรหัสผิด (คงระบบเดิมของคุณไว้)
+        // เอฟเฟกต์กล่องสั่นเมื่อล็อกอินผิดพลาด
         const styleSheet = document.styleSheets[0];
         styleSheet.insertRule(`
             @keyframes shake {
