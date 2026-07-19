@@ -2,10 +2,9 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>รายการอุปกรณ์รถ</title>
+<title>รายการอุปกรณ์รถ - Accessory Copy Tool</title>
 
 <style>
-
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
   
 /* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
@@ -14,15 +13,16 @@
 }
 
 body {
-  font-family: 'Sarabun', Arial, sans-serif; /* เปลี่ยนเป็น TH Sarabun */
+  font-family: 'Sarabun', Arial, sans-serif;
   margin: 0;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: transparent !important;
+  background: #0d0d11 !important;
   overflow: hidden;
-  font-size: 16px; /* ขยายขนาดเริ่มต้นให้อ่านง่ายขึ้น */
+  font-size: 16px;
 }
+
 /* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
 #bg-video {
   position: fixed;
@@ -36,23 +36,25 @@ body {
 .video-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.25); /* ฟิล์มดำบางๆ ช่วยให้ตัวอักษรอ่านง่ายขึ้น */
+  background: rgba(0, 0, 0, 0.45); /* แผ่นฟิล์มดำช่วยดันให้มิติกล่องกระจกเด่นชัดขึ้น */
   z-index: -1;
 }
 
-/* ===== แถบด้านบน (Top Bar) ===== */
+/* ===== แถบด้านบน (Top Bar) สีแดงโปร่งแสงหรูหราเข้าชุด ===== */
 .topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background: linear-gradient(90deg, #d90000, #ff2d2d);
+  background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   padding: 0 20px;
-  box-shadow: 0 3px 10px rgba(0,0,0,.25);
-  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
   z-index: 9999;
 }
 
@@ -61,6 +63,7 @@ body {
   height: 50px;
   object-fit: contain;
   margin-right: 15px;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
 }
 
 .topbar h1 {
@@ -68,139 +71,297 @@ body {
   margin: 0;
   font-size: 24px;
   font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
 .topbar span {
-  color: #ffe9e9;
+  color: rgba(255, 233, 233, 0.9);
   font-size: 14px;
   display: block;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลางและยืดเต็มจอปกติ (Layout) ===== */
+/* ===== ปุ่มกลับหน้าหลัก/ออกจากระบบ ด้านขวาบน ===== */
+.btn-logout {
+  padding: 8px 16px;
+  background-color: #e53e3e;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+  
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 99999;
+}
+
+.btn-logout:hover {
+  background-color: #c53030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(229, 62, 62, 0.5);
+}
+
+.btn-logout:active {
+  transform: translateY(0px);
+}
+
+/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลางยืดเต็มจอปกติ ===== */
 .container {
   margin-top: 70px;
   height: calc(100vh - 70px);
   width: 100%;
-  max-width: 1600px; /* จำกัดความกว้างให้พอดีสายตา ไม่ยืดกว้างเกินไป */
+  max-width: 1600px;
   margin-left: auto;
   margin-right: auto;
   display: flex;
-  padding: 15px;
-  gap: 15px;
+  padding: 20px;
+  gap: 20px;
   position: relative;
   z-index: 1;
 }
 
-/* ===== คอลัมน์ (ปรับให้เป็นกระจกใส โค้งมน) ===== */
+/* ===== คอลัมน์แบบกระจกใส โปร่งแสงมีมิติมากขึ้น ===== */
 .column {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: 15px;
+  padding: 20px;
   overflow-y: auto;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.25) !important; /* ปรับระดับความใสตรงนี้ */
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
 
-/* ===== กล่องหมวดหมู่ย่อยด้านใน ===== */
+/* ปรับแต่งความสวยงามของแถบเลื่อน (Scrollbar) ให้เข้ากับยุคสมัยกระจกใส */
+.column::-webkit-scrollbar {
+  width: 6px;
+}
+.column::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+}
+.column::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+}
+.column::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+/* ===== กล่องหมวดหมู่ย่อยด้านใน ปรับให้เข้ากับธีมมืดใส ===== */
 .category {
-  background: rgba(255, 255, 255, 0.4) !important;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.06) !important;
+  padding: 18px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* เปลี่ยนสีหัวข้อเป็นสีขาวสว่าง ดึงสายตาชัดเจน */
 h2 {
   font-family: 'Sarabun', Arial, sans-serif;
-  font-size: 19px; /* ขยายขนาดหัวข้อ */
+  font-size: 20px;
   margin-top: 0;
-  margin-bottom: 12px;
-  color: #111;
-  font-weight: 700;
+  margin-bottom: 14px;
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
 }
 
+/* ปุ่มสำหรับการเลือกคัดลอก */
 .item {
-  padding: 10px 12px;
-  margin: 6px 0;
-  background: rgba(255, 255, 255, 0.7) !important;
+  padding: 12px 14px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.85) !important;
   border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 8px;
   cursor: pointer;
   font-family: 'Sarabun', Arial, sans-serif;
-  font-size: 15px; /* ขยายขนาดตัวอักษรปุ่ม */
+  font-size: 15px;
   font-weight: 500;
-  color: #222;
+  color: #1a1a1a;
   transition: all 0.2s ease;
 }
 
 .item:hover {
-  background: rgba(207, 232, 255, 0.9) !important;
-  transform: translateX(4px); /* เอฟเฟกต์เลื่อนขวาเบาๆ เวลาเอาเมาส์ชี้ */
+  background: rgba(255, 255, 255, 1) !important;
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
-/* ไฮไลท์ตัวล่าสุดเมื่อกดคัดลอก */
+/* ไฮไลท์ปุ่มสีฟ้า เมื่อก๊อปปี้สำเร็จ */
 .item.active {
-  background: #2f96ec !important;
-  color: #fff;
-  font-weight: bold;
-  border-color: #2f96ec;
-  box-shadow: 0 0 10px rgba(47, 150, 236, 0.5);
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.6);
+  transform: translateX(6px);
 }
 </style>
 
 </head>
 <body>
 
-    <!-- ปุ่มออกจากระบบ (ไม่ต้องเปลี่ยน) -->
+    <!-- ปุ่มออกจากระบบกลับไปหน้าล็อกอิน -->
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
 
-    <!-- ก๊อปปี้ style ชุดใหม่นี้ไปวางแทนที่ style อันเก่าครับ -->
-    <style>
-        .btn-logout {
-            padding: 6px 14px;
-            background-color: #e53e3e;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 6px;
-            font-family: 'Sarabun', sans-serif;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            
-            /* จัดให้อยู่ขวาบนสุดเหนือทุกสิ่ง */
-            position: fixed;
-            top: 15px;
-            right: 20px;
-            z-index: 99999;
-        }
+    <!-- เครื่องเล่นวิดีโอพื้นหลังต่อเนื่อง -->
+    <video id="bg-video" autoplay muted playsinline></video>
+    <div class="video-overlay"></div>
 
-        .btn-logout:hover {
-            background-color: #c53030;
-            transform: translateY(-1px);
-        }
+    <!-- แถบเมนูด้านบนโปร่งแสงกระจกสีแดงแบรนด์ ABLE -->
+    <div class="topbar">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
+        <div>
+            <h1>รายการอุปกรณ์รถ MG</h1>
+            <span>Accessory Copy Tool</span>
+        </div>
+    </div>
 
-        .btn-logout:active {
-            transform: translateY(0);
-        }
-    </style>
+    <!-- คอนเทนเนอร์คอลัมน์รายการ -->
+    <div class="container">
 
-    <!-- โค้ดเนื้อหาเว็บเดิมของคุณ... -->
+        <!-- คอลัมน์ 1 -->
+        <div class="column">
+            <div class="category">
+                <h2>🔧 งานพื้นฐาน / ค่าใช้จ่าย</h2>
+                <div class="item" onclick="copy(this)">PDI</div>
+                <div class="item" onclick="copy(this)">ล้างขัดเคลือบ</div>
+                <div class="item" onclick="copy(this)">กรอบป้าย</div>
+                <div class="item" onclick="copy(this)">ค่าติดตั้ง</div>
+                <div class="item" onclick="copy(this)">ค่าชาร์จไฟฟ้า</div>
+                <div class="item" onclick="copy(this)">ค่ารถสไลด์</div>
+                <div class="item" onclick="copy(this)">ค่าจดทะเบียน</div>
+                <div class="item" onclick="copy(this)">ค่าแนะนำ</div>
+                <div class="item" onclick="copy(this)">น้ำมัน</div>
+                <div class="item" onclick="copy(this)">CASH BACK</div>
+                <div class="item" onclick="copy(this)">cash back</div>
+                <div class="item" onclick="copy(this)">ส่วนลด vat 7%</div>
+                <div class="item" onclick="copy(this)">ส่วนลดดอกเบี้ย</div>
+                <div class="item" onclick="copy(this)">ค่าลอกฟิล์ม</div>
+                <div class="item" onclick="copy(this)">ค่าเปลี่ยนป้ายจังหวัด</div>
+                <div class="item" onclick="copy(this)">ซับค่าบัตรชาร์จ3%</div>
+                <div class="item" onclick="copy(this)">ค่าประกันภัยชั้น1+พรบ.</div>
+            </div>
 
-    <!-- จากตรงนี้จะเป็นโค้ดเนื้อหาเดิมของหน้าเว็บคุณ... -->
+            <div class="category">
+                <h2>🪟 ฟิล์ม / เคลือบ</h2>
+                <div class="item" onclick="copy(this)">AA NANO CERAMIC</div>
+                <div class="item" onclick="copy(this)">AA CERAMIC ACE</div>
+                <div class="item" onclick="copy(this)">AA CERAMIC UV</div>
+                <div class="item" onclick="copy(this)">AA NANO CERAMIC+SUNROOF</div>
+                <div class="item" onclick="copy(this)">AA Ceramic ACE+SUNROOF</div>
+                <div class="item" onclick="copy(this)">AA CERAMIC UV+SUNROOF</div>
+                <div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION </div>
+                <div class="item" onclick="copy(this)">HI-KOOL CERAMIC BLACK EDITION</div>
+                <div class="item" onclick="copy(this)">HI KOOL BEYOND CERAMIC</div>
+                <div class="item" onclick="copy(this)">HI-KOOL BRAVO CERAMIC</div>
+                <div class="item" onclick="copy(this)">HI-KOOL MAX</div>
+                <div class="item" onclick="copy(this)">SUPER HI KOOL BEYOND CERAMIC</div>
+                <div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION+SUNROOF</div>
+                <div class="item" onclick="copy(this)">HI-KOOL CERAMIC BLACK EDITION+SUNROOF</div>
+                <div class="item" onclick="copy(this)">HI KOOL BEYOND CERAMIC+SUNROOF</div>
+                <div class="item" onclick="copy(this)">HI-KOOL BRAVO CERAMIC+SUNROOF</div>
+                <div class="item" onclick="copy(this)">HI-KOOL MAX+SUNROOF</div>  
+                <div class="item" onclick="copy(this)">SUPER HI KOOL BEYOND CERAMIC+SUNROOF</div>
+                <div class="item" onclick="copy(this)">3M CERAMATE</div>  
+                <div class="item" onclick="copy(this)">3M CERAMATE+SUNROOF</div>
+                <div class="item" onclick="copy(this)">SOLAR GARD BLACKBOLD</div>
+                <div class="item" onclick="copy(this)">SOLAR GARD BLACKBOLD+SUNROOF</div>
+                <div class="item" onclick="copy(this)">LAMINA CERAMATRIX</div>
+                <div class="item" onclick="copy(this)">LAMINA CERAMATRIX+SUNROOF</div>
+                <div class="item" onclick="copy(this)">เคลือบแก้ว ONE SHOT</div>
+                <div class="item" onclick="copy(this)">เคลือบแก้ว GRAPHENE 1ปี</div>
+            </div>
+        </div>
 
-<!-- 1. ใส่แท็กสร้างเครื่องเล่นวิดีโอก่อน -->
-<video id="bg-video" autoplay muted playsinline></video>
-<div class="video-overlay"></div>
-<!-- 👈 ตรวจสอบและพิมพ์เติมแท็ก <script> ตรงนี้เลยครับ -->
+        <!-- คอลัมน์ 2 -->
+        <div class="column">
+            <div class="category">
+                <h2>🛋️ อุปกรณ์ภายใน</h2>
+                <div class="item" onclick="copy(this)">ผ้ายาง MG</div>
+                <div class="item" onclick="copy(this)">พรม 6D (6ชิ้น)</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D03) สีดำด้ายดำ</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D17) สีเทาด้านครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D06) สีดำด้ายครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D05) สีไวท์แดงด้ายครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (E10)</div>
+                <div class="item" onclick="copy(this)">พรม 6D (H03)</div>
+                <div class="item" onclick="copy(this)">พรม 6D (H16)สีน้ำตาลอ่อน-ครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (E16)น้ำตาลอ่อนด้ายดำ</div>
+                <div class="item" onclick="copy(this)">พrom 6D (D01) สีกาแฟด้ายครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D02) สีดำด้ายแดง</div>
+                <div class="item" onclick="copy(this)">พรม 6D (A04) น้ำตาลเข้ม</div>
+                <div class="item" onclick="copy(this)">ถาดท้าย</div>
+                <div class="item" onclick="copy(this)">ม่านบังแดดหลังคา-เทา</div>
+                <div class="item" onclick="copy(this)">ม่านบังแดดหลังคา-เทา SUN SHADE IM5</div>  
+                <div class="item" onclick="copy(this)">ม่านเปิด-ปิด ไฟฟ้าอัตโนมัติ</div>
+                <div class="item" onclick="copy(this)">แผ่นซิลิโคนรองแท่นชาร์จไร้สาย</div>
+                <div class="item" onclick="copy(this)">ช่องจัดระเบียนเก็บของใต้คอนโซลกลาง</div>
+                <div class="item" onclick="copy(this)">ช่องจัดระเบียบเก็บของคนโซลกลาง</div>
+            </div>
+
+            <div class="category">
+                <h2>📷 เทคโนโลยี</h2>
+                <div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง MG</div>
+                <div class="item" onclick="copy(this)">กล้องหน้า 3 นิ้ว</div>
+                <div class="item" onclick="copy(this)">กล้องหน้าแท้</div>
+                <div class="item" onclick="copy(this)">เมมโมรี่การ์ด 16 GB</div>
+                <div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง +ห้องโดยสาร+เมมเมอรี่</div>
+                <div class="item" onclick="copy(this)">แม่เหล็กแรงดูดพิเศษ IM MAX</div>
+            </div>
+        </div>
+
+        <!-- คอลัมน์ 3 -->
+        <div class="column">
+            <div class="category">
+                <h2>🚗 อุปกรณ์ภายนอก</h2>
+                <div class="item" onclick="copy(this)">กันสาด</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น)</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น) RIDER V2</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น) RIDER V3</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี (4ชิ้น) SANTO V1</div>
+                <div class="item" onclick="copy(this)">สเกิร์ตรอบคัน+สปอยเลอร์แนบ(5ชิ้น)SANTO</div>
+                <div class="item" onclick="copy(this)">ชุดแต่ง SONIC ขอบแดง</div>
+                <div class="item" onclick="copy(this)">ชุดแต่ง SONIC ขอบแดง</div>
+                <div class="item" onclick="copy(this)">ผ้าคลุมรถซิลเวอร์โค้ท</div>
+                <div class="item" onclick="copy(this)">แผ่นรองใต้เครื่อง MG</div>
+                <div class="item" onclick="copy(this)">สคัพเพลท</div>  
+                <div class="item" onclick="copy(this)">สคัพเพลท ชุบ สกรีนโลโก้</div>
+                <div class="item" onclick="copy(this)">ตะแกรงกันแมลงกระจังหน้า</div>
+                <div class="item" onclick="copy(this)">โช๊คค้ำฝากระโปรงคู่หน้า</div>
+                <div class="item" onclick="copy(this)">ตะแกรงสแตนเลสครอบช่องแอร์กันหนู</div>
+            </div>
+
+            <div class="category">
+                <h2>⚙️ ระบบไฟฟ้า</h2>
+                <div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า</div>
+                <div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
+                <div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
+            </div>
+
+            <div class="category">
+                <h2>🎁 อื่นๆ</h2>
+                <div class="item" onclick="copy(this)">ปลอกกุญแจ</div>
+                <div class="item" onclick="copy(this)">หมวก MG G00000192</div>
+            </div>
+        </div>
+
+    </div>
+
+<!-- JavaScript ควบคุมจัดการระบบวิดีโอและระบบคัดลอกดั้งเดิมทั้งหมด -->
 <script>
-// ลิงก์วิดีโอทั้ง 3 ตัว ปรับให้เล่นวนไปเรื่อยๆ ครับ
 const videoSources = [
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
@@ -230,165 +391,13 @@ if (videoPlayer) {
 }
 
 window.addEventListener("DOMContentLoaded", playNextVideo);
-</script>
 
-<div class="video-overlay"></div>
-
-<div class="topbar">
-
-    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
-
-    <div>
-        <h1>รายการอุปกรณ์รถ MG</h1>
-        <span>Accessory Copy Tool</span>
-    </div>
-
-</div>
-
-<div class="container">
-
-<!-- คอลัมน์ 1 -->
-<div class="column">
-
-<div class="category">
-<h2>🔧 งานพื้นฐาน / ค่าใช้จ่าย</h2>
-<div class="item" onclick="copy(this)">PDI</div>
-<div class="item" onclick="copy(this)">ล้างขัดเคลือบ</div>
-<div class="item" onclick="copy(this)">กรอบป้าย</div>
-<div class="item" onclick="copy(this)">ค่าติดตั้ง</div>
-<div class="item" onclick="copy(this)">ค่าชาร์จไฟฟ้า</div>
-<div class="item" onclick="copy(this)">ค่ารถสไลด์</div>
-<div class="item" onclick="copy(this)">ค่าจดทะเบียน</div>
-<div class="item" onclick="copy(this)">ค่าแนะนำ</div>
-<div class="item" onclick="copy(this)">น้ำมัน</div>
-<div class="item" onclick="copy(this)">CASH BACK</div>
-<div class="item" onclick="copy(this)">cash back</div>
-<div class="item" onclick="copy(this)">ส่วนลด vat 7%</div>
-<div class="item" onclick="copy(this)">ส่วนลดดอกเบี้ย</div>
-<div class="item" onclick="copy(this)">ค่าลอกฟิล์ม</div>
-<div class="item" onclick="copy(this)">ค่าเปลี่ยนป้ายจังหวัด</div>
-<div class="item" onclick="copy(this)">ซับค่าบัตรชาร์จ3%</div>
-<div class="item" onclick="copy(this)">ค่าประกันภัยชั้น1+พรบ.</div>
-</div>
-
-<div class="category">
-<h2>🪟 ฟิล์ม / เคลือบ</h2>
-<div class="item" onclick="copy(this)">AA NANO CERAMIC</div>
-<div class="item" onclick="copy(this)">AA CERAMIC ACE</div>
-<div class="item" onclick="copy(this)">AA CERAMIC UV</div>
-<div class="item" onclick="copy(this)">AA NANO CERAMIC+SUNROOF</div>
-<div class="item" onclick="copy(this)">AA Ceramic ACE+SUNROOF</div>
-<div class="item" onclick="copy(this)">AA CERAMIC UV+SUNROOF</div>
-<div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION </div>
-<div class="item" onclick="copy(this)">HI-KOOL CERAMIC BLACK EDITION</div>
-<div class="item" onclick="copy(this)">HI KOOL BEYOND CERAMIC</div>
-<div class="item" onclick="copy(this)">HI-KOOL BRAVO CERAMIC</div>
-<div class="item" onclick="copy(this)">HI-KOOL MAX</div>
-<div class="item" onclick="copy(this)">SUPER HI KOOL BEYOND CERAMIC</div>
-<div class="item" onclick="copy(this)">HI-KOOL BLACK EDITION+SUNROOF</div>
-<div class="item" onclick="copy(this)">HI-KOOL CERAMIC BLACK EDITION+SUNROOF</div>
-<div class="item" onclick="copy(this)">HI KOOL BEYOND CERAMIC+SUNROOF</div>
-<div class="item" onclick="copy(this)">HI-KOOL BRAVO CERAMIC+SUNROOF</div>
-<div class="item" onclick="copy(this)">HI-KOOL MAX+SUNROOF</div>  
-<div class="item" onclick="copy(this)">SUPER HI KOOL BEYOND CERAMIC+SUNROOF</div>
-<div class="item" onclick="copy(this)">3M CERAMATE</div>  
-<div class="item" onclick="copy(this)">3M CERAMATE+SUNROOF</div>
-<div class="item" onclick="copy(this)">SOLAR GARD BLACKBOLD</div>
-<div class="item" onclick="copy(this)">SOLAR GARD BLACKBOLD+SUNROOF</div>
-<div class="item" onclick="copy(this)">LAMINA CERAMATRIX</div>
-<div class="item" onclick="copy(this)">LAMINA CERAMATRIX+SUNROOF</div>
-<div class="item" onclick="copy(this)">เคลือบแก้ว ONE SHOT</div>
-<div class="item" onclick="copy(this)">เคลือบแก้ว GRAPHENE 1ปี</div>
-</div>
-
-</div>
-
-<!-- คอลัมน์ 2 -->
-<div class="column">
-
-<div class="category">
-<h2>🛋️ อุปกรณ์ภายใน</h2>
-<div class="item" onclick="copy(this)">ผ้ายาง MG</div>
-<div class="item" onclick="copy(this)">พรม 6D (6ชิ้น)</div>
-<div class="item" onclick="copy(this)">พรม 6D (D03) สีดำด้ายดำ</div>
-<div class="item" onclick="copy(this)">พรม 6D (D17) สีเทาด้านครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D06) สีดำด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D05) สีไวท์แดงด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (E10)</div>
-<div class="item" onclick="copy(this)">พรม 6D (H03)</div>
-<div class="item" onclick="copy(this)">พรม 6D (H16)สีน้ำตาลอ่อน-ครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (E16)น้ำตาลอ่อนด้ายดำ</div>
-<div class="item" onclick="copy(this)">พรม 6D (D01) สีกาแฟด้ายครีม</div>
-<div class="item" onclick="copy(this)">พรม 6D (D02) สีดำด้ายแดง</div>
-<div class="item" onclick="copy(this)">พรม 6D (A04) น้ำตาลเข้ม</div>
-<div class="item" onclick="copy(this)">ถาดท้าย</div>
-<div class="item" onclick="copy(this)">ม่านบังแดดหลังคา-เทา</div>
-<div class="item" onclick="copy(this)">ม่านบังแดดหลังคา-เทา SUN SHADE IM5</div>  
-<div class="item" onclick="copy(this)">ม่านเปิด-ปิด ไฟฟ้าอัตโนมัติ</div>
-<div class="item" onclick="copy(this)">แผ่นซิลิโคนรองแท่นชาร์จไร้สาย</div>
-<div class="item" onclick="copy(this)">ช่องจัดระเบียนเก็บของใต้คอนโซลกลาง</div>
-<div class="item" onclick="copy(this)">ช่องจัดระเบียบเก็บของคนโซลกลาง</div>
-</div>
-
-<div class="category">
-<h2>📷 เทคโนโลยี</h2>
-<div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง MG</div>
-<div class="item" onclick="copy(this)">กล้องหน้า 3 นิ้ว</div>
-<div class="item" onclick="copy(this)">กล้องหน้าแท้</div>
-<div class="item" onclick="copy(this)">เมมโมรี่การ์ด 16 GB</div>
-<div class="item" onclick="copy(this)">กล้องบันทึกหน้า+หลัง +ห้องโดยสาร+เมมเมอรี่</div>
-<div class="item" onclick="copy(this)">แม่เหล็กแรงดูดพิเศษ IM MAX</div>
-</div>
-
-</div>
-
-<!-- คอลัมน์ 3 -->
-<div class="column">
-
-<div class="category">
-<h2>🚗 อุปกรณ์ภายนอก</h2>
-<div class="item" onclick="copy(this)">กันสาด</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น)</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น) RIDER V2</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน (4ชิ้น) RIDER V3</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน พร้อมทำสี (4ชิ้น) SANTO V1</div>
-<div class="item" onclick="copy(this)">สเกิร์ตรอบคัน+สปอยเลอร์แนบ(5ชิ้น)SANTO</div>
-<div class="item" onclick="copy(this)">ชุดแต่ง SONIC ขอบแดง</div>
-<div class="item" onclick="copy(this)">ชุดแต่ง SONIC ขอบแดง</div>
-<div class="item" onclick="copy(this)">ผ้าคลุมรถซิลเวอร์โค้ท</div>
-<div class="item" onclick="copy(this)">แผ่นรองใต้เครื่อง MG</div>
-<div class="item" onclick="copy(this)">สคัพเพลท</div>  
-<div class="item" onclick="copy(this)">สคัพเพลท ชุบ สกรีนโลโก้</div>
-<div class="item" onclick="copy(this)">ตะแกรงกันแมลงกระจังหน้า</div>
-<div class="item" onclick="copy(this)">โช๊คค้ำฝากระโปรงคู่หน้า</div>
-<div class="item" onclick="copy(this)">ตะแกรงสแตนเลสครอบช่องแอร์กันหนู</div>
-</div>
-
-<div class="category">
-<h2>⚙️ ระบบไฟฟ้า</h2>
-<div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า</div>
-<div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
-<div class="item" onclick="copy(this)">ประตูท้ายไฟฟ้า+เซ็นเซอร์เท้า</div>
-</div>
-
-<div class="category">
-<h2>🎁 อื่นๆ</h2>
-<div class="item" onclick="copy(this)">ปลอกกุญแจ</div>
-<div class="item" onclick="copy(this)">หมวก MG G00000192</div>
-</div>
-
-</div>
-
-</div>
-
-<script>
+// ระบบฟังก์ชั่นการกด Copy
 let lastActive = null;
 
 function copy(el) {
   const text = el.innerText;
 
-  // คัดลอก
   if (navigator.clipboard && window.isSecureContext) {
     navigator.clipboard.writeText(text).catch(() => {
       fallbackCopy(text);
@@ -397,7 +406,6 @@ function copy(el) {
     fallbackCopy(text);
   }
 
-  // ไฮไลท์ตัวล่าสุด
   if (lastActive) {
     lastActive.classList.remove("active");
   }
@@ -422,14 +430,11 @@ function fallbackCopy(text) {
 
   document.body.removeChild(textarea);
 }
-</script>
 
-  <script>
-    // สั่งการเมื่อมีการกดปุ่มออกจากระบบ
-    document.getElementById('logoutBtn').addEventListener('click', function() {
-        // ดีดผู้ใช้งานกลับไปที่หน้าล็อกอินจำลอง
-        window.location.href = 'index.html';
-    });
+// สั่งการเมื่อมีการกดปุ่มออกจากระบบ
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    window.location.href = 'index.html';
+});
 </script>
 
 </body>
