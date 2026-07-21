@@ -2,12 +2,13 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>เลือกฟังก์ชั่นการใช้งาน - Accessory Copy Tool</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
   
-/* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
+/* ===== ตั้งค่าเริ่มต้นหน้าเว็บ ===== */
 * {
   box-sizing: border-box;
 }
@@ -23,7 +24,7 @@ body {
   font-size: 16px;
 }
 
-/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน ===== */
 #bg-video {
   position: fixed;
   inset: 0;
@@ -36,26 +37,45 @@ body {
 .video-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45); /* ปรับฟิล์มดำให้เข้มขึ้นเล็กน้อยเพื่อให้มิติกล่องกระจกใสลอยเด่น */
+  background: rgba(0, 0, 0, 0.45);
   z-index: -1;
 }
 
-/* ===== แถบด้านบน (Top Bar) ปรับใหม่ให้โปร่งใสสไตล์กระจกหรูหรา ===== */
+/* ===== แถบด้านบน (Top Bar) ===== */
 .topbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 70px;
-  background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2)); /* ใช้สีแดงโปร่งแสง */
+  background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2));
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   padding: 0 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px); /* รองรับเบราว์เซอร์ Safari */
-  z-index: 9999;
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 999;
+}
+
+/* ปุ่ม Hamburger Icon */
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.1);
 }
 
 .topbar img {
@@ -63,7 +83,7 @@ body {
   height: 50px;
   object-fit: contain;
   margin-right: 15px;
-  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3)); /* เพิ่มมิติให้โลโก้เด่นขึ้น */
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
 }
 
 .topbar h1 {
@@ -81,7 +101,76 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== ปุ่มกลับหน้าหลัก/ออกจากระบบ ด้านขวาบน ===== */
+/* ===== Hamburger Menu (Nav Drawer) ===== */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scrim.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: rgba(20, 20, 28, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  z-index: 9999;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.nav-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.drawer-menu {
+  list-style: none;
+  padding: 15px 0;
+  margin: 0;
+  flex: 1;
+}
+
+.drawer-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 14px 25px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.drawer-menu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding-left: 30px;
+}
+
+/* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
 .btn-logout {
   padding: 8px 16px;
   background-color: #e53e3e;
@@ -94,11 +183,10 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-  
   position: fixed;
   top: 16px;
   right: 20px;
-  z-index: 99999;
+  z-index: 1000;
 }
 
 .btn-logout:hover {
@@ -111,7 +199,7 @@ body {
   transform: translateY(0px);
 }
 
-/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลางหน้าจอ ===== */
+/* ===== ส่วนควบคุมเนื้อหาหลัก ===== */
 .container {
   margin-top: 70px;
   height: calc(100vh - 70px);
@@ -129,7 +217,7 @@ body {
   z-index: 1;
 }
 
-/* ===== คอลัมน์เมนูกระจกใส ปรับความชัดเจนของข้อความใหม่ ===== */
+/* ===== คอลัมน์เมนูกระจกใส ===== */
 .column-menu {
   flex: 1;
   max-width: 420px;
@@ -138,7 +226,7 @@ body {
   padding: 40px 30px;
   border: 2px solid rgba(255, 255, 255, 0.15);
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08) !important; /* ปรับให้ใสขึ้นรับกับฉากหน้าแรก */
+  background: rgba(255, 255, 255, 0.08) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
@@ -152,7 +240,6 @@ body {
   border-color: rgba(255, 255, 255, 0.3);
 }
 
-/* ===== ปรับสีข้อความด้านในให้อ่านง่ายตัดกับวิดีโอมืด ===== */
 h2 {
   font-family: 'Sarabun', Arial, sans-serif;
   font-size: 24px;
@@ -172,10 +259,9 @@ h2 {
   text-shadow: 0 1px 3px rgba(0,0,0,0.5);
 }
 
-/* ===== ปุ่มฟังก์ชั่นสไตล์โมเดิร์นเข้าคู่กัน ===== */
 .menu-btn {
   padding: 14px 20px;
-  background: #3b82f6 !important; /* เปลี่ยนเป็นโทนสีฟ้าเรืองแสงตามธีมหลัก */
+  background: #3b82f6 !important;
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -187,7 +273,6 @@ h2 {
   box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
 }
 
-/* ยกเลิก css hover ตัวเก่าที่เปลี่ยนสีพื้นหลังกล่อง */
 .column-menu:hover .menu-btn {
   background: #3b82f6 !important;
 }
@@ -203,37 +288,53 @@ h2 {
   transform: scale(1);
 }
 </style>
-
 </head>
 <body>
 
-    <!-- ปุ่มออกจากระบบกลับไปหน้า Login -->
+    <!-- ปุ่ม Logout -->
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
 
-    <!-- วิดีโอพื้นหลังเล่นต่อเนื่องแบบสุ่ม/วนลูป เหมือนหน้าหลัก -->
+    <!-- วิดีโอพื้นหลัง -->
     <video id="bg-video" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
 
-    <!-- แถบเมนูด้านบนสไตล์กระจกใสสีแดงแบรนด์ ABLE -->
+    <!-- Scrim (แผ่นเงาสีดำเมื่อเปิด Nav Drawer) -->
+    <div id="scrim" class="scrim"></div>
+
+    <!-- Nav Drawer (Side Menu) -->
+    <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
+        <div class="drawer-header">เมนูหลัก</div>
+        <ul class="drawer-menu">
+            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
+            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
+            <li><a href="#">📋 รายงาน / ประวัติ</a></li>
+            <li><a href="#">⚙️ ตั้งค่าระบบ</a></li>
+        </ul>
+    </nav>
+
+    <!-- Topbar -->
     <div class="topbar">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
+        <!-- ปุ่มไอคอน Hamburger -->
+        <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
+        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
         <div>
             <h1>รายการอุปกรณ์รถ MG</h1>
             <span>Accessory Copy Tool</span>
         </div>
     </div>
 
-    <!-- กล่องเลือกฟังก์ชั่นจัดเรียงจากซ้ายไปขวาอย่างเป็นระเบียบ -->
+    <!-- ส่วนเนื้อหาหลัก -->
     <div class="container">
 
-        <!-- ฟังก์ชั่นที่ 1 (ฝั่งซ้าย) -->
+        <!-- Card 1 -->
         <div class="column-menu">
             <h2>🚗 อุปกรณ์ตกแต่ง</h2>
             <div class="menu-desc">ระบบคัดลอกรายการอุปกรณ์ตกแต่งรถยนต์ และงานพื้นฐานทั่วไป</div>
             <button class="menu-btn" onclick="location.href='main.html'">เปิดใช้งานฟังก์ชั่น</button>
         </div>
 
-        <!-- ฟังก์ชั่นที่ 2 (ฝั่งขวา) -->
+        <!-- Card 2 -->
         <div class="column-menu">
             <h2>🔧 อะไหล่เช็กระยะ</h2>
             <div class="menu-desc">ระบบคัดลอกรายการของเหลว และบำรุงรักษาตามรอบระยะทาง</div>
@@ -242,8 +343,29 @@ h2 {
 
     </div>
 
-<!-- JavaScript สำหรับควบคุมวิดีโอพื้นหลังและปุ่ม Log out เหมือนเดิมร้อยเปอร์เซ็นต์ -->
 <script>
+// ===== JavaScript สำหรับ Hamburger Menu (Nav Drawer) =====
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navDrawer = document.getElementById('navDrawer');
+const scrim = document.getElementById('scrim');
+
+function toggleDrawer() {
+    const isOpen = navDrawer.classList.contains('open');
+    if (isOpen) {
+        navDrawer.classList.remove('open');
+        scrim.classList.remove('active');
+        navDrawer.setAttribute('aria-expanded', 'false');
+    } else {
+        navDrawer.classList.add('open');
+        scrim.classList.add('active');
+        navDrawer.setAttribute('aria-expanded', 'true');
+    }
+}
+
+hamburgerBtn.addEventListener('click', toggleDrawer);
+scrim.addEventListener('click', toggleDrawer);
+
+// ===== JavaScript ควบคุมวิดีโอพื้นหลัง =====
 const videoSources = [
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
@@ -274,7 +396,7 @@ if (videoPlayer) {
 
 window.addEventListener("DOMContentLoaded", playNextVideo);
 
-// สั่งการเมื่อมีการกดปุ่มออกจากระบบ
+// สั่งการเมื่อกดปุ่ม Log out
 document.getElementById('logoutBtn').addEventListener('click', function() {
     window.location.href = 'index.html';
 });
