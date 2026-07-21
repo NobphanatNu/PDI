@@ -7,6 +7,11 @@
     <style>
         body { font-family: 'Sarabun', Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        
+        /* ส่วนหัวและโลโก้ */
+        .header-logo { text-align: center; margin-bottom: 20px; }
+        .header-logo img { max-width: 150px; height: auto; } /* ใส่ URL รูปโลโก้ของคุณตรงนี้ */
+        
         h1 { text-align: center; color: #d32f2f; margin-bottom: 25px; font-size: 24px; }
         .form-group { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
         .form-control { flex: 1; min-width: 200px; }
@@ -29,14 +34,17 @@
 <body>
 
 <div class="container">
-    <h1>🚘 ตารางคำนวณและสรุปค่าบริการเช็กระยะ MG</h1>
+    <!-- พื้นที่ใส่โลโก้ -->
+    <div class="header-logo">
+        <h1 style="margin:0;">🚘 ตารางคำนวณและสรุปค่าบริการเช็กระยะ MG</h1>
+    </div>
     
     <div class="form-group">
         <div class="form-control">
             <label for="carModel">เลือกรุ่นรถ:</label>
             <select id="carModel" onchange="calculateService()">
                 <option value="NEW_MG_ZS">New MG ZS</option>
-                <option value="MG_ZS_EV">MG ZS EV</option>
+                <option value="MG_ZS_EV" selected>MG ZS EV</option>
                 <option value="NEW_MG_ZS_EV">New MG ZS EV</option>
             </select>
         </div>
@@ -77,33 +85,26 @@
 </div>
 
 <script>
-// ข้อมูลฐานระบบตามตาราง
+// ข้อมูลอะไหล่ดึงตามตารางจริง
+const partsDB = {
+    "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 (4L)", unit: 1, price: 1495 },
+    "11486328": { name: "ไส้กรองน้ำมันเครื่อง", unit: 1, price: 240 },
+    "ALU1403": { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", unit: 1, price: 12 },
+    "G00000362": { name: "ไส้กรองอากาศ", unit: 1, price: 355 },
+    "G00000266": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5", unit: 1, price: 590 },
+    "G00000356": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5 (New EV)", unit: 1, price: 590 },
+    "10189906_EV": { name: "น้ำยาหม้อน้ำ 4 ลิตร (Coolant 4L)", unit: 2, price: 790 }, // ZS EV ใช้ 2 แกลลอน
+    "10196876_EV": { name: "น้ำยาหม้อน้ำ 1 ลิตร (Coolant 1L)", unit: 2, price: 195 }, // ZS EV ใช้ 2 ขวด
+    "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร (Coolant 4L)", unit: 1, price: 790 },
+    "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร (Coolant 1L)", unit: 1, price: 195 },
+    "G00000459": { name: "น้ำมันเบรก 1 ลิตร", unit: 1, price: 498 },
+    "10137065": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (ZS EV)", unit: 2, price: 1175 },
+    "10925167": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (New ZS EV)", unit: 1, price: 1500 },
+    "10004211": { name: "แหวนรองเติมน้ำมันเกียร์", unit: 1, price: 3 },
+    "10064941": { name: "แหวนถ่ายน้ำมันเกียร์", unit: 1, price: 9 }
+};
+
 const masterData = {
-    parts: {
-        "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 (4L)", unit: 1, price: 1495 },
-        "11486328": { name: "ไส้กรองน้ำมันเครื่อง", unit: 1, price: 240 },
-        "ALU1403": { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", unit: 1, price: 12 },
-        "G00000362": { name: "ไส้กรองอากาศ", unit: 1, price: 355 },
-        "G00000266": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5", unit: 1, price: 590 },
-        "G00000356": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5 (EV)", unit: 1, price: 590 },
-        "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร", unit: 1, price: 790 },
-        "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร", unit: 1, price: 195 },
-        "G00000459": { name: "น้ำมันเบรก 1 ลิตร", unit: 1, price: 498 },
-        "10137065": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (ZS EV)", unit: 2, price: 1175 },
-        "10925167": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (New ZS EV)", unit: 1, price: 1500 },
-        "10004211": { name: "แหวนรองเติมน้ำมันเกียร์", unit: 1, price: 3 },
-        "10064941": { name: "แหวนถ่ายน้ำมันเกียร์", unit: 1, price: 9 },
-        "10471721": { name: "น้ำมันเกียร์อัตโนมัติ CVT 1 ลิตร", unit: 4, price: 425 },
-        "10407695": { name: "แหวนรองเติมน้ำมันเกียร์ CVT", unit: 1, price: 7 },
-        "10811222": { name: "แหวนถ่ายน้ำมันเกียร์ CVT", unit: 1, price: 9 },
-        "10501598": { name: "ปลั๊กถ่ายน้ำมันเกียร์", unit: 1, price: 16 },
-        "10406912": { name: "ไส้กรองน้ำมันเกียร์", unit: 1, price: 350 },
-        "10406973": { name: "ไส้กรองเครื่องกรองแรงดันต่ำเกียร์", unit: 1, price: 170 },
-        "10412354": { name: "โอริ่งไส้กรองเครื่องกรองแรงดันเกียร์", unit: 1, price: 9 },
-        "11446616": { name: "หัวเทียน", unit: 4, price: 165 },
-        "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง", unit: 1, price: 235 },
-        "10202623": { name: "สายพานขับหน้าเครื่อง", unit: 1, price: 410 }
-    },
     schedules: {
         "NEW_MG_ZS": {
             labourFreeKm: [10000, 20000, 30000, 40000, 50000],
@@ -115,10 +116,6 @@ const masterData = {
                 if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266");
                 if ([100000, 200000, 300000].includes(km)) list.push("10189906", "10196876");
                 if ([60000, 120000, 180000, 240000, 300000].includes(km)) list.push("G00000459");
-                if ([80000, 160000, 240000].includes(km)) list.push("10471721", "10407695", "10811222", "10501598", "10406912", "10406973", "10412354");
-                if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("11446616");
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("10137854");
-                if ([120000, 240000].includes(km)) list.push("10202623");
                 return list;
             }
         },
@@ -128,8 +125,12 @@ const masterData = {
             labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
             getParts: (km) => {
                 let list = [];
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266", "G00000459");
-                if ([80000, 160000, 240000].includes(km)) list.push("10189906", "10196876", "10137065", "10004211", "10064941");
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) {
+                    list.push("G00000266", "G00000459");
+                }
+                if ([80000, 160000, 240000].includes(km)) {
+                    list.push("10189906_EV", "10196876_EV", "10137065", "10004211", "10064941");
+                }
                 return list;
             }
         },
@@ -139,20 +140,25 @@ const masterData = {
             labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
             getParts: (km) => {
                 let list = [];
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000356", "G00000459");
-                if ([80000, 160000, 240000].includes(km)) list.push("10189906", "10196876", "10925167", "10004211", "10064941");
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) {
+                    list.push("G00000356", "G00000459");
+                }
+                if ([80000, 160000, 240000].includes(km)) {
+                    list.push("10189906", "10196876", "10925167", "10004211", "10064941");
+                }
                 return list;
             }
         }
     }
 };
 
-// เติมตัวเลือกระยะทาง 10,000 - 300,000 กม.
+// เติม Dropdown กม.
 const kmSelect = document.getElementById('serviceKm');
 for (let km = 10000; km <= 300000; km += 10000) {
     let opt = document.createElement('option');
     opt.value = km;
     opt.textContent = `${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)`;
+    if(km === 80000) opt.selected = true; // เลือก 80,000 กม. เป็นค่าเริ่มต้น
     kmSelect.appendChild(opt);
 }
 
@@ -172,17 +178,18 @@ function calculateService() {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#777;">ไม่มีรายการเปลี่ยนอะไหล่ในรอบนี้ (ตรวจเช็กตามระยะฟรี/ปกติ)</td></tr>`;
     } else {
         partKeys.forEach((key, idx) => {
-            const item = masterData.parts[key];
+            const item = partsDB[key];
+            const cleanKey = key.replace('_EV', '');
             const itemTotal = item.price * item.unit;
             partsTotal += itemTotal;
 
             tbody.innerHTML += `
                 <tr>
-                    <td>${key}</td>
+                    <td>${cleanKey}</td>
                     <td>${item.name}</td>
                     <td class="text-center">${item.unit}</td>
-                    <td class="text-right">${item.price.toLocaleString('.2f')}</td>
-                    <td class="text-right">${itemTotal.toLocaleString('.2f')}</td>
+                    <td class="text-right">${item.price.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                    <td class="text-right">${itemTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
                 </tr>
             `;
             summaryTextParts.push(`${idx + 1}. ${item.name} x${item.unit} = ${itemTotal.toLocaleString()} บาท`);
@@ -200,12 +207,12 @@ function calculateService() {
     const grandTotal = subtotal + vat;
 
     // แสดงผล
-    document.getElementById('partsTotal').innerText = `${partsTotal.toFixed(2)} บาท`;
-    document.getElementById('labourTotal').innerText = isFree ? `ฟรี (${hours} ชม.)` : `${labourCost.toFixed(2)} บาท (${hours} ชม.)`;
-    document.getElementById('vatTotal').innerText = `${vat.toFixed(2)} บาท`;
-    document.getElementById('grandTotal').innerText = `${grandTotal.toFixed(2)} บาท`;
+    document.getElementById('partsTotal').innerText = `${partsTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
+    document.getElementById('labourTotal').innerText = isFree ? `ฟรี (${hours} ชม.)` : `${labourCost.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท (${hours} ชม.)`;
+    document.getElementById('vatTotal').innerText = `${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
+    document.getElementById('grandTotal').innerText = `${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
 
-    // สร้างข้อความ Text สรุปสำหรับคัดลอก
+    // สรุป Text
     const modelName = document.getElementById('carModel').options[document.getElementById('carModel').selectedIndex].text;
     let copyStr = `รายการเช็กระยะ ${modelName} - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
     copyStr += `----------------------------------------\n`;
@@ -215,10 +222,10 @@ function calculateService() {
         copyStr += `ไม่มีรายการเปลี่ยนอะไหล่ (ตรวจเช็กระยะอย่างเดียว)\n`;
     }
     copyStr += `----------------------------------------\n`;
-    copyStr += `รวมค่าอะไหล่: ${partsTotal.toLocaleString('.2f')} บาท\n`;
-    copyStr += `ค่าแรงบริการ: ${isFree ? 'ฟรี' : labourCost.toLocaleString('.2f') + ' บาท'}\n`;
-    copyStr += `ภาษีมูลค่าเพิ่ม (7%): ${vat.toLocaleString('.2f')} บาท\n`;
-    copyStr += `ยอดรวมสุทธิ: ${grandTotal.toLocaleString('.2f')} บาท`;
+    copyStr += `รวมค่าอะไหล่: ${partsTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท\n`;
+    copyStr += `ค่าแรงบริการ: ${isFree ? 'ฟรี' : labourCost.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท'}\n`;
+    copyStr += `ภาษีมูลค่าเพิ่ม (7%): ${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท\n`;
+    copyStr += `ยอดรวมสุทธิ: ${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
 
     document.getElementById('copyText').value = copyStr;
 }
@@ -230,7 +237,7 @@ function copyToClipboard() {
     alert("คัดลอกข้อความสรุปเรียบร้อยแล้ว!");
 }
 
-// เรียกคำนวณครั้งแรก
+// คำนวณเมื่อโหลดหน้าเว็บ
 calculateService();
 </script>
 
