@@ -119,12 +119,21 @@ select:focus { border-color: #e53e3e; }
 .item-row.active { background: #3b82f6; color: #fff; }
 .part-no { font-size: 13px; color: #666; font-family: monospace; }
 .item-row.active .part-no { color: rgba(255,255,255,0.8); }
+
+.toast {
+  position: fixed; bottom: 20px; right: 20px;
+  background: #22c55e; color: white; padding: 12px 24px;
+  border-radius: 8px; font-weight: 500; font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10000;
+}
+.toast.show { opacity: 1; }
 </style>
 </head>
 <body>
 
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
-    <video id="bg-video" autoplay muted playsinline></video>
+    <video id="bg-video" autoplay muted playsinline loop></video>
     <div class="video-overlay"></div>
 
     <div id="scrim" class="scrim"></div>
@@ -152,7 +161,7 @@ select:focus { border-color: #e53e3e; }
             <div class="select-group">
                 <label for="carModelSelect">🚗 เลือกรุ่นรถ:</label>
                 <select id="carModelSelect">
-                    <option value="">-- กำลังโหลดข้อมูลจาก Google Sheet... --</option>
+                    <option value="">-- เลือกรุ่นรถ --</option>
                 </select>
             </div>
 
@@ -171,74 +180,127 @@ select:focus { border-color: #e53e3e; }
         </div>
     </div>
 
+    <div id="toast" class="toast">คัดลอกรายการแล้ว!</div>
+
 <script>
-// ลิงก์ CSV ที่แปลงจาก Google Sheets ของคุณ
-const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/1Zf0Et-VbMcbnYcCrCBy6hODGGTALarM1wy1zw8tfCNg/export?format=csv';
+// =========================================================================
+// 📌 รายชื่อรุ่นรถตรงตาม Google Drive ของคุณ
+// (นำ File ID จาก Google Sheets แต่ละไฟล์มาวางในสัญลักษณ์ "" ได้เลยครับ)
+// =========================================================================
+const carModelFiles = {
+    "MG V80": "1Zf0Et-VbMcbnYcCrCBy6hODGGTALarM1wy1zw8tfCNg",
+    "MG MAXUS 7": "",
+    "MG MAXUS 9": "",
+    "MG GS 2.0T": "",
+    "MG GS 1.5T": "",
+    "MG ZS": "",
+    "MG ZS EV": "",
+    "NEW MG 5": "",
+    "NEW MG 6": "",
+    "NEW MG HS": "",
+    "NEW MG HS PHEV": "",
+    "NEW MG IM6-IM5": "",
+    "NEW MG S5 EV": "",
+    "NEW MG VS HEV": "",
+    "NEW MG ZS": "",
+    "NEW MG ZS EV": "",
+    "MG3": "",
+    "ALL NEW MG3": "",
+    "MG5 NON TURBO": "",
+    "MG5 TURBO": ""
+};
 
-let parsedDatabase = {}; 
+let currentFileData = {};
 
-async function loadTableData() {
-    try {
-        const response = await fetch(GOOGLE_SHEET_CSV_URL);
-        if (!response.ok) throw new Error('Network response was not ok');
-        const rawText = await response.text();
-        parseCSVToDataStructure(rawText);
-        populateModelDropdown();
-    } catch (err) {
-        console.error("ไม่สามารถดึงข้อมูลจาก Google Sheets ได้:", err);
-        displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการโหลดข้อมูล กรุณาตรวจสอบว่า Google Sheet ตั้งค่าการแชร์เป็น "ทุกคนที่มีลิงก์" หรือยัง</div>';
-    }
+const carModelSelect = document.getElementById('carModelSelect');
+const mileageSelect = document.getElementById('mileageSelect');
+const displayArea = document.getElementById('displayArea');
+const toast = document.getElementById('toast');
+
+// 1. โหลดรายชื่อรุ่นรถใส่ Dropdown
+function initModelDropdown() {
+    carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
+    Object.keys(carModelFiles).forEach(model => {
+        const opt = document.createElement('option');
+        opt.value = model;
+        opt.textContent = model;
+        carModelSelect.appendChild(opt);
+    });
 }
 
-function parseCSVToDataStructure(csvText) {
-    parsedDatabase = {}; 
+// 2. ดึงข้อมูล CSV ของรุ่นที่เลือก
+carModelSelect.addEventListener('change', async function() {
+    const selectedModel = this.value;
+    mileageSelect.innerHTML = '<option value="">-- กำลังโหลดข้อมูล... --</option>';
+    mileageSelect.disabled = true;
+    displayArea.innerHTML = '<div class="empty-state">กำลังดึงข้อมูลตารางเช็กระยะ...</div>';
+
+    if (!selectedModel) {
+        mileageSelect.innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
+        displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
+        return;
+    }
+
+    const fileId = carModelFiles[selectedModel];
+
+    if (!fileId) {
+        displayArea.innerHTML = `<div class="empty-state">ยังไม่ได้ใส่ File ID สำหรับรุ่น <b>${selectedModel}</b><br><small>(นำ File ID จาก Google Sheet มาใส่ในตัวแปร carModelFiles ในโค้ด)</small></div>`;
+        mileageSelect.innerHTML = '<option value="">-- ไม่พบไฟล์ข้อมูล --</option>';
+        return;
+    }
+
+    const fileUrl = `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv`;
+
+    try {
+        const response = await fetch(fileUrl);
+        if (!response.ok) throw new Error('ไม่สามารถเข้าถึงไฟล์ได้');
+        const csvText = await response.text();
+        
+        parseSingleModelCSV(csvText);
+        populateMileageDropdown();
+    } catch (err) {
+        console.error("Error loading file:", err);
+        displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการดึงข้อมูล<br><small>กรุณาตรวจสอบว่าเปิดสิทธิ์ Google Sheet ให้เป็น "ทุกคนที่มีลิงก์" แล้วหรือยัง</small></div>';
+        mileageSelect.innerHTML = '<option value="">-- เกิดข้อผิดพลาด --</option>';
+    }
+});
+
+// 3. แปลง CSV เป็น Object ข้อมูล
+function parseSingleModelCSV(csvText) {
+    currentFileData = {};
     const lines = csvText.split(/\r?\n/);
-    let currentModel = "";
-    let currentMileage = "";
+    let currentMileage = "รายการทั่วไป / ทุกระยะ";
 
     lines.forEach(line => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) return;
+        const trimmed = line.trim();
+        if (!trimmed) return;
 
-        const cols = trimmedLine.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-        const fullLineText = cols.join(' ');
+        const cols = trimmed.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        const fullText = cols.join(' ');
 
-        // ตรวจจับชื่อรุ่นรถที่มีตัวเลขนำหน้า เช่น 21-MG V80, 1-MG3, 2-All new MG3
-        const modelMatch = fullLineText.match(/(?:\d+-)?(MG[A-Za-z0-9\s]+|All\s+new\s+MG[A-Za-z0-9\s]+|New\s+MG[A-Za-z0-9\s]+)/i);
-
-        if (modelMatch && !fullLineText.includes("Part no") && !fullLineText.includes("เบอร์อะไหล่") && !fullLineText.includes("ตาราง")) {
-            let cleanModelName = modelMatch[0].replace(/^\d+-/, '').trim();
-            if (cleanModelName) {
-                currentModel = cleanModelName;
-                if (!parsedDatabase[currentModel]) {
-                    parsedDatabase[currentModel] = {};
-                }
-            }
-        }
-        else if (fullLineText.includes("กม.") || fullLineText.includes("Km") || fullLineText.includes("เดือน") || fullLineText.includes("ระยะ")) {
+        if (fullText.includes("กม.") || fullText.includes("Km") || fullText.includes("เดือน") || fullText.includes("ระยะ")) {
             const mileageText = cols[0] || cols[1] || "";
             if (mileageText && !mileageText.includes("Part no") && !mileageText.includes("เบอร์อะไหล่")) {
                 currentMileage = mileageText;
-                if (currentModel && !parsedDatabase[currentModel][currentMileage]) {
-                    parsedDatabase[currentModel][currentMileage] = [];
+                if (!currentFileData[currentMileage]) {
+                    currentFileData[currentMileage] = [];
                 }
             }
         }
-        else if (cols.length >= 2 && currentModel) {
+        else if (cols.length >= 2) {
             const partNo = cols[0];
             const partName = cols[1];
             const price = cols[2] || "-";
 
             const isHeader = partNo.includes("เบอร์อะไหล่") || partNo.includes("Part no") || 
-                             partNo.includes("Service Distance") || partNo.includes("เดือนที่");
+                             partNo.includes("Service Distance") || partNo.includes("เดือนที่") || partNo.includes("ตาราง");
 
             if (partNo && partName && !isHeader) {
-                const targetMileage = currentMileage || "รายการทั่วไป / ทุกระยะ";
-                if (!parsedDatabase[currentModel][targetMileage]) {
-                    parsedDatabase[currentModel][targetMileage] = [];
+                if (!currentFileData[currentMileage]) {
+                    currentFileData[currentMileage] = [];
                 }
 
-                parsedDatabase[currentModel][targetMileage].push({
+                currentFileData[currentMileage].push({
                     partNo: partNo,
                     name: partName,
                     price: price
@@ -248,57 +310,34 @@ function parseCSVToDataStructure(csvText) {
     });
 }
 
-const carModelSelect = document.getElementById('carModelSelect');
-const mileageSelect = document.getElementById('mileageSelect');
-const displayArea = document.getElementById('displayArea');
+// 4. แสดงรอบเช็กระยะ
+function populateMileageDropdown() {
+    const mileages = Object.keys(currentFileData);
 
-function populateModelDropdown() {
-    const models = Object.keys(parsedDatabase);
-
-    if (models.length === 0) {
-        carModelSelect.innerHTML = '<option value="">-- ไม่พบรายชื่อรุ่นรถในไฟล์ --</option>';
+    if (mileages.length === 0) {
+        mileageSelect.innerHTML = '<option value="">-- ไม่พบข้อมูลรอบระยะในไฟล์ --</option>';
+        displayArea.innerHTML = '<div class="empty-state">ไม่พบรายการอะไหล่ในไฟล์นี้</div>';
         return;
     }
 
-    carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
-    models.forEach(model => {
-        const opt = document.createElement('option');
-        opt.value = model;
-        opt.textContent = model;
-        carModelSelect.appendChild(opt);
-    });
-}
-
-carModelSelect.addEventListener('change', function() {
-    const selectedModel = this.value;
-    mileageSelect.innerHTML = '';
-
-    if (!selectedModel || !parsedDatabase[selectedModel]) {
-        mileageSelect.innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
-        mileageSelect.disabled = true;
-        displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
-        return;
-    }
-
-    const mileages = Object.keys(parsedDatabase[selectedModel]);
     mileageSelect.disabled = false;
     mileageSelect.innerHTML = '<option value="">-- เลือกรอบเช็กระยะ --</option>';
-
-    mileages.forEach(mileage => {
+    mileages.forEach(m => {
         const opt = document.createElement('option');
-        opt.value = mileage;
-        opt.textContent = mileage;
+        opt.value = m;
+        opt.textContent = m;
         mileageSelect.appendChild(opt);
     });
-});
 
+    displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
+}
+
+// 5. แสดงรายการเมื่อเลือกรอบระยะ
 mileageSelect.addEventListener('change', function() {
-    const model = carModelSelect.value;
     const mileage = this.value;
+    if (!mileage) return;
 
-    if (!model || !mileage) return;
-
-    const items = parsedDatabase[model]?.[mileage];
+    const items = currentFileData[mileage];
 
     if (items && items.length > 0) {
         let html = '<div class="item-list">';
@@ -320,6 +359,7 @@ mileageSelect.addEventListener('change', function() {
     }
 });
 
+// คัดลอกข้อความ
 let lastActiveRow = null;
 function copyText(text, element) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -338,8 +378,12 @@ function copyText(text, element) {
     if (lastActiveRow) lastActiveRow.classList.remove('active');
     element.classList.add('active');
     lastActiveRow = element;
+
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2000);
 }
 
+// Side Drawer Menu
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -353,7 +397,8 @@ scrim.addEventListener('click', toggleDrawer);
 
 document.getElementById('logoutBtn').addEventListener('click', () => window.location.href = 'index.html');
 
-window.addEventListener('DOMContentLoaded', loadTableData);
+// เริ่มต้นระบบ
+window.addEventListener('DOMContentLoaded', initModelDropdown);
 </script>
 </body>
 </html>
