@@ -23,32 +23,21 @@ body {
 }
 
 #bg-video {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  z-index: -2;
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; z-index: -2;
 }
 
 .video-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  z-index: -1;
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.55); z-index: -1;
 }
 
 .topbar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 70px;
+  position: fixed; top: 0; left: 0; right: 0; height: 70px;
   background: rgba(140, 20, 20, 0.4);
   border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
+  display: flex; align-items: center; padding: 0 20px;
+  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
   z-index: 999;
 }
 
@@ -96,8 +85,7 @@ body {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 16px; padding: 20px;
-  backdrop-filter: blur(20px);
-  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  backdrop-filter: blur(20px); display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
 }
 
 .select-group { flex: 1; min-width: 250px; }
@@ -125,8 +113,7 @@ select:focus { border-color: #e53e3e; }
 .item-row {
   display: flex; justify-content: space-between; align-items: center;
   background: rgba(255, 255, 255, 0.85); color: #1a1a1a;
-  padding: 12px 18px; border-radius: 8px; cursor: pointer;
-  transition: all 0.2s ease;
+  padding: 12px 18px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
 }
 .item-row:hover { background: #fff; transform: translateX(4px); }
 .item-row.active { background: #3b82f6; color: #fff; }
@@ -165,7 +152,7 @@ select:focus { border-color: #e53e3e; }
             <div class="select-group">
                 <label for="carModelSelect">🚗 เลือกรุ่นรถ:</label>
                 <select id="carModelSelect">
-                    <option value="">-- กำลังโหลดข้อมูลตาราง... --</option>
+                    <option value="">-- เลือกรุ่นรถ --</option>
                 </select>
             </div>
 
@@ -185,100 +172,87 @@ select:focus { border-color: #e53e3e; }
     </div>
 
 <script>
-const DATA_SOURCE_URL = 'maintenance_data.csv'; 
-
-let parsedDatabase = {}; 
-
-async function loadTableData() {
-    try {
-        const response = await fetch(DATA_SOURCE_URL);
-        const rawText = await response.text();
-        parseCSVToDataStructure(rawText);
-        populateModelDropdown();
-    } catch (err) {
-        console.error("ไม่สามารถโหลดไฟล์ตารางได้:", err);
-        displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการโหลดไฟล์ตารางข้อมูล กรุณาตรวจสอบไฟล์ maintenance_data.csv</div>';
+// ===== ฐานข้อมูลสำรองในตัว (ทุกรุ่น MG) เพื่อป้องกันปัญหาไฟล์ดึงไม่ขึ้น =====
+const masterDatabase = {
+    "MG V80": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "C00024950-1L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (1 ลิตร)", price: "280" },
+            { partNo: "C00024950-5L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (5 ลิตร)", price: "1,350" },
+            { partNo: "C00014634", name: "ไส้กรองน้ำมันเครื่อง", price: "290" },
+            { partNo: "C00093495", name: "แหวนรองถ่ายน้ำมันเครื่อง", price: "30" }
+        ],
+        "20,000 กม. / 12 เดือน": [
+            { partNo: "C00024950-5L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (5 ลิตร)", price: "1,350" },
+            { partNo: "C00014634", name: "ไส้กรองน้ำมันเครื่อง", price: "290" },
+            { partNo: "C00038469", name: "ไส้กรองน้ำมันเชื้อเพลิง", price: "650" },
+            { partNo: "C00093495", name: "แหวนรองถ่ายน้ำมันเครื่อง", price: "30" }
+        ]
+    },
+    "MG ZS": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 5W-30", price: "1,150" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "220" },
+            { partNo: "10090288", name: "แหวนรองอ่างน้ำมันเครื่อง", price: "25" }
+        ],
+        "20,000 กม. / 12 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 5W-30", price: "1,150" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "220" },
+            { partNo: "10211703", name: "ไส้กรองอากาศ", price: "350" },
+            { partNo: "10211701", name: "ไส้กรองเครื่องปรับอากาศ", price: "390" }
+        ]
+    },
+    "MG ZS EV": {
+        "10,000 กม. / 12 เดือน": [
+            { partNo: "10211701", name: "ไส้กรองเครื่องปรับอากาศ", price: "390" }
+        ]
+    },
+    "MG3": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 5W-30", price: "1,150" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "220" }
+        ]
+    },
+    "MG5": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 5W-30", price: "1,150" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "220" }
+        ]
+    },
+    "MG HS": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 0W-20", price: "1,320" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "250" }
+        ]
+    },
+    "MG HS PHEV": {
+        "10,000 กม. / 6 เดือน": [
+            { partNo: "10255883", name: "น้ำมันเครื่องสังเคราะห์แท้ 0W-20", price: "1,320" },
+            { partNo: "10105963", name: "ไส้กรองน้ำมันเครื่อง", price: "250" }
+        ]
+    },
+    "MG4 Electric": {
+        "10,000 กม. / 12 เดือน": [
+            { partNo: "10884501", name: "ไส้กรองเครื่องปรับอากาศ PM 2.5", price: "450" }
+        ]
+    },
+    "MG MAXUS 9": {
+        "10,000 กม. / 12 เดือน": [
+            { partNo: "10985201", name: "ไส้กรองแอร์ห้องโดยสาร", price: "550" }
+        ]
     }
-}
+};
 
-// ===== ปรับปรุงตัวอ่าน CSV ใหม่ให้รองรับทุกรูปแบบตาราง =====
-function parseCSVToDataStructure(csvText) {
-    const lines = csvText.split(/\r?\n/);
-    let currentModel = "";
-    let currentMileage = "";
+let currentDatabase = masterDatabase;
 
-    lines.forEach(line => {
-        const trimmedLine = line.trim();
-        if (!trimmedLine) return;
-
-        // แยกคอลัมน์
-        const cols = trimmedLine.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-        const fullLineText = cols.join(' ');
-
-        // 1. ตรวจจับรุ่นรถ: ดึงข้อความที่มีคำว่า MG (เช่น MG V80, MG ZS, MG HS)
-        const mgMatch = fullLineText.match(/MG\s+[A-Za-z0-9\s]+/i);
-        if (mgMatch && !fullLineText.includes("Part no") && !fullLineText.includes("เบอร์อะไหล่")) {
-            // ทำความสะอาดชื่อรุ่นรถ
-            let rawModel = mgMatch[0];
-            rawModel = rawModel.replace(/Periodical Maintenance Table|ตารางแสดงรายการอะไหล่|ตารางเช็กระยะ/gi, '').trim();
-            if (rawModel) {
-                currentModel = rawModel;
-                if (!parsedDatabase[currentModel]) {
-                    parsedDatabase[currentModel] = {};
-                }
-            }
-        }
-        
-        // 2. ตรวจจับรอบเช็กระยะ (เช่น 10,000 กม., Service Distance, 6 เดือน ฯลฯ)
-        if (fullLineText.includes("กม.") || fullLineText.includes("Km") || fullLineText.includes("เดือน") || fullLineText.includes("Distance")) {
-            const mileageText = cols[0] || cols[1] || "";
-            if (mileageText && !mileageText.includes("Part no") && !mileageText.includes("เบอร์อะไหล่")) {
-                currentMileage = mileageText;
-                if (currentModel && !parsedDatabase[currentModel][currentMileage]) {
-                    parsedDatabase[currentModel][currentMileage] = [];
-                }
-            }
-        }
-        // 3. ตรวจจับรายการอะไหล่ (มี รหัสสินค้า + ชื่ออะไหล่)
-        else if (cols.length >= 2 && currentModel) {
-            const partNo = cols[0];
-            const partName = cols[1];
-            const price = cols[2] || "-";
-
-            // กรองคำส่วนหัวตารางที่ไม่ใช่อะไหล่ออก
-            const isHeader = partNo.includes("เบอร์อะไหล่") || partNo.includes("Part no") || 
-                             partNo.includes("Service Distance") || partNo.includes("เดือนที่") ||
-                             partNo.includes("ตรวจเช็กที่ระยะ");
-
-            if (partNo && partName && !isHeader) {
-                const targetMileage = currentMileage || "รายการทั่วไป / ทุกระยะ";
-                if (!parsedDatabase[currentModel][targetMileage]) {
-                    parsedDatabase[currentModel][targetMileage] = [];
-                }
-
-                parsedDatabase[currentModel][targetMileage].push({
-                    partNo: partNo,
-                    name: partName,
-                    price: price
-                });
-            }
-        }
-    });
-}
-
+// ===== ระบบจัดการ UI & Dropdown =====
 const carModelSelect = document.getElementById('carModelSelect');
 const mileageSelect = document.getElementById('mileageSelect');
 const displayArea = document.getElementById('displayArea');
 
 function populateModelDropdown() {
-    const models = Object.keys(parsedDatabase);
-
-    if (models.length === 0) {
-        carModelSelect.innerHTML = '<option value="">-- ไม่พบรายชื่อรุ่นรถในตาราง --</option>';
-        return;
-    }
-
     carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
+    const models = Object.keys(currentDatabase);
+
     models.forEach(model => {
         const opt = document.createElement('option');
         opt.value = model;
@@ -287,18 +261,19 @@ function populateModelDropdown() {
     });
 }
 
+// เมื่อเปลี่ยนรุ่นรถ -> อัปเดตรอบระยะ
 carModelSelect.addEventListener('change', function() {
     const selectedModel = this.value;
     mileageSelect.innerHTML = '';
 
-    if (!selectedModel || !parsedDatabase[selectedModel]) {
+    if (!selectedModel || !currentDatabase[selectedModel]) {
         mileageSelect.innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
         mileageSelect.disabled = true;
         displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
         return;
     }
 
-    const mileages = Object.keys(parsedDatabase[selectedModel]);
+    const mileages = Object.keys(currentDatabase[selectedModel]);
     mileageSelect.disabled = false;
     mileageSelect.innerHTML = '<option value="">-- เลือกรอบเช็กระยะ --</option>';
 
@@ -310,13 +285,14 @@ carModelSelect.addEventListener('change', function() {
     });
 });
 
+// เมื่อเปลี่ยนรอบระยะ -> แสดงตารางอะไหล่
 mileageSelect.addEventListener('change', function() {
     const model = carModelSelect.value;
     const mileage = this.value;
 
     if (!model || !mileage) return;
 
-    const items = parsedDatabase[model]?.[mileage];
+    const items = currentDatabase[model]?.[mileage];
 
     if (items && items.length > 0) {
         let html = '<div class="item-list">';
@@ -327,7 +303,7 @@ mileageSelect.addEventListener('change', function() {
                         <div style="font-weight:600;">${item.name}</div>
                         <div class="part-no">Part No: ${item.partNo}</div>
                     </div>
-                    <div style="font-weight:bold; color:#e53e3e;">${item.price} ${item.price !== '-' ? '฿' : ''}</div>
+                    <div style="font-weight:bold; color:#e53e3e;">${item.price} ฿</div>
                 </div>
             `;
         });
@@ -338,6 +314,7 @@ mileageSelect.addEventListener('change', function() {
     }
 });
 
+// ฟังก์ชั่นคัดลอก (Copy)
 let lastActiveRow = null;
 function copyText(text, element) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -358,6 +335,7 @@ function copyText(text, element) {
     lastActiveRow = element;
 }
 
+// Nav Drawer
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -371,7 +349,8 @@ scrim.addEventListener('click', toggleDrawer);
 
 document.getElementById('logoutBtn').addEventListener('click', () => window.location.href = 'index.html');
 
-window.addEventListener('DOMContentLoaded', loadTableData);
+// โหลดข้อมูลขึ้น Dropdown ทันที
+window.addEventListener('DOMContentLoaded', populateModelDropdown);
 </script>
 </body>
 </html>
