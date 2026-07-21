@@ -8,7 +8,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
   
-/* ===== ตั้งค่าเริ่มต้นหน้าเว็บ ===== */
+/* ===== ตั้งค่าเริ่มต้นหน้าเว็บให้เต็มจอพอดี ไม่หลุดขอบ ===== */
 * {
   box-sizing: border-box;
 }
@@ -41,7 +41,7 @@ body {
   z-index: -1;
 }
 
-/* ===== แถบด้านบน (Top Bar) ===== */
+/* ===== แถบด้านบน (Top Bar) สไตล์กระจก ===== */
 .topbar {
   position: fixed;
   top: 0;
@@ -101,7 +101,36 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== Hamburger Menu (Nav Drawer) ===== */
+/* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
+.btn-logout {
+  padding: 8px 16px;
+  background-color: #e53e3e;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.btn-logout:hover {
+  background-color: #c53030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(229, 62, 62, 0.5);
+}
+
+.btn-logout:active {
+  transform: translateY(0px);
+}
+
+/* ===== Hamburger Menu (Nav Drawer Side Panel) ===== */
 .scrim {
   position: fixed;
   inset: 0;
@@ -168,35 +197,6 @@ body {
   background: rgba(255, 255, 255, 0.1);
   color: #fff;
   padding-left: 30px;
-}
-
-/* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
-.btn-logout {
-  padding: 8px 16px;
-  background-color: #e53e3e;
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 6px;
-  font-family: 'Sarabun', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-  position: fixed;
-  top: 16px;
-  right: 20px;
-  z-index: 1000;
-}
-
-.btn-logout:hover {
-  background-color: #c53030;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(229, 62, 62, 0.5);
-}
-
-.btn-logout:active {
-  transform: translateY(0px);
 }
 
 /* ===== ส่วนควบคุมเนื้อหาหลัก ===== */
@@ -291,30 +291,29 @@ h2 {
 </head>
 <body>
 
-    <!-- ปุ่ม Logout -->
+    <!-- ปุ่มออกจากระบบ -->
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
 
     <!-- วิดีโอพื้นหลัง -->
     <video id="bg-video" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
 
-    <!-- Scrim (แผ่นเงาสีดำเมื่อเปิด Nav Drawer) -->
+    <!-- Scrim (แผ่นเงาเมื่อสไลด์เปิดเมนู) -->
     <div id="scrim" class="scrim"></div>
 
-    <!-- Nav Drawer (Side Menu) -->
+    <!-- Hamburger Nav Drawer ด้านข้าง -->
     <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
-        <div class="drawer-header">เมนูหลัก</div>
+        <div class="drawer-header">เมนูการใช้งาน</div>
         <ul class="drawer-menu">
+            <li><a href="index.html">🏠 กลับหน้าหลัก</a></li>
             <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
             <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
-            <li><a href="#">📋 รายงาน / ประวัติ</a></li>
-            <li><a href="#">⚙️ ตั้งค่าระบบ</a></li>
         </ul>
     </nav>
 
-    <!-- Topbar -->
+    <!-- แถบ Topbar -->
     <div class="topbar">
-        <!-- ปุ่มไอคอน Hamburger -->
+        <!-- ปุ่ม Hamburger -->
         <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
         
         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
@@ -324,7 +323,7 @@ h2 {
         </div>
     </div>
 
-    <!-- ส่วนเนื้อหาหลัก -->
+    <!-- เนื้อหาหลัก -->
     <div class="container">
 
         <!-- Card 1 -->
@@ -344,7 +343,7 @@ h2 {
     </div>
 
 <script>
-// ===== JavaScript สำหรับ Hamburger Menu (Nav Drawer) =====
+// JavaScript ควบคุม Hamburger Menu
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -365,7 +364,7 @@ function toggleDrawer() {
 hamburgerBtn.addEventListener('click', toggleDrawer);
 scrim.addEventListener('click', toggleDrawer);
 
-// ===== JavaScript ควบคุมวิดีโอพื้นหลัง =====
+// ควบคุมวิดีโอพื้นหลัง
 const videoSources = [
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
