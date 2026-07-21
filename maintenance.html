@@ -1,404 +1,238 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>รายการอะไหล่เช็กระยะ MG - Accessory Copy Tool</title>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
-  
-* { box-sizing: border-box; }
-
-body {
-  font-family: 'Sarabun', Arial, sans-serif;
-  margin: 0;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  background: #0d0d11 !important;
-  overflow: hidden;
-  font-size: 16px;
-  color: #fff;
-}
-
-#bg-video {
-  position: fixed; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; z-index: -2;
-}
-
-.video-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0, 0, 0, 0.55); z-index: -1;
-}
-
-.topbar {
-  position: fixed; top: 0; left: 0; right: 0; height: 70px;
-  background: rgba(140, 20, 20, 0.4);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  display: flex; align-items: center; padding: 0 20px;
-  backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-  z-index: 999;
-}
-
-.hamburger-btn {
-  background: none; border: none; color: #fff; font-size: 26px;
-  cursor: pointer; margin-right: 15px; display: flex; align-items: center;
-}
-
-.topbar img { width: 100px; height: 40px; object-fit: contain; margin-right: 15px; }
-.topbar h1 { margin: 0; font-size: 20px; font-weight: bold; }
-.topbar span { color: rgba(255, 233, 233, 0.8); font-size: 12px; display: block; }
-
-.btn-logout {
-  padding: 8px 16px; background-color: #e53e3e; color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px;
-  font-family: 'Sarabun', sans-serif; font-size: 14px; font-weight: 600;
-  cursor: pointer; position: fixed; top: 16px; right: 20px; z-index: 1000;
-}
-
-.scrim {
-  position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
-  z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s;
-}
-.scrim.active { opacity: 1; pointer-events: auto; }
-
-.nav-drawer {
-  position: fixed; top: 0; left: -300px; width: 280px; height: 100vh;
-  background: rgba(20, 20, 28, 0.9); backdrop-filter: blur(25px);
-  border-right: 1px solid rgba(255, 255, 255, 0.15); z-index: 9999;
-  transition: left 0.3s ease; display: flex; flex-direction: column; padding: 20px 0;
-}
-.nav-drawer.open { left: 0; }
-.drawer-header { padding: 0 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; }
-.drawer-menu { list-style: none; padding: 15px 0; margin: 0; }
-.drawer-menu li a { display: block; padding: 14px 25px; color: #fff; text-decoration: none; }
-.drawer-menu li a:hover { background: rgba(255, 255, 255, 0.1); }
-
-.container {
-  margin-top: 70px; height: calc(100vh - 70px);
-  width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto;
-  padding: 20px; display: flex; flex-direction: column; gap: 20px;
-}
-
-.selector-card {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px; padding: 20px;
-  backdrop-filter: blur(20px); display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
-}
-
-.select-group { flex: 1; min-width: 250px; }
-.select-group label { display: block; margin-bottom: 8px; font-weight: 500; font-size: 15px; }
-
-select {
-  width: 100%; padding: 12px 16px;
-  background: rgba(30, 32, 45, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px; color: #fff; font-family: 'Sarabun', sans-serif;
-  font-size: 15px; outline: none; cursor: pointer;
-}
-select:focus { border-color: #e53e3e; }
-
-.result-card {
-  flex: 1; background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px; padding: 20px;
-  backdrop-filter: blur(20px); overflow-y: auto;
-}
-
-.empty-state { text-align: center; color: rgba(255,255,255,0.5); padding: 50px 0; }
-
-.item-list { display: flex; flex-direction: column; gap: 10px; }
-.item-row {
-  display: flex; justify-content: space-between; align-items: center;
-  background: rgba(255, 255, 255, 0.85); color: #1a1a1a;
-  padding: 12px 18px; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;
-}
-.item-row:hover { background: #fff; transform: translateX(4px); }
-.item-row.active { background: #3b82f6; color: #fff; }
-.part-no { font-size: 13px; color: #666; font-family: monospace; }
-.item-row.active .part-no { color: rgba(255,255,255,0.8); }
-
-.toast {
-  position: fixed; bottom: 20px; right: 20px;
-  background: #22c55e; color: white; padding: 12px 24px;
-  border-radius: 8px; font-weight: 500; font-size: 14px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 10000;
-}
-.toast.show { opacity: 1; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>โปรแกรมคำนวณค่าเช็กระยะ MG</title>
+    <style>
+        body { font-family: 'Sarabun', Arial, sans-serif; background-color: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #d32f2f; margin-bottom: 25px; font-size: 24px; }
+        .form-group { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .form-control { flex: 1; min-width: 200px; }
+        label { display: block; font-weight: bold; margin-bottom: 8px; }
+        select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 16px; }
+        .card { background: #fafafa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: #fff; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; font-size: 14px; }
+        th { background-color: #f1f1f1; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .total-box { background: #e8f5e9; border: 1px solid #a5d6a7; border-radius: 8px; padding: 15px; margin-top: 15px; }
+        .total-row { display: flex; justify-content: space-between; font-size: 16px; margin-bottom: 8px; }
+        .total-row.grand { font-size: 18px; font-weight: bold; color: #2e7d32; border-top: 1px solid #a5d6a7; padding-top: 8px; }
+        .copy-btn { width: 100%; background: #1976d2; color: #fff; border: none; padding: 12px; font-size: 16px; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.2s; margin-top: 15px; }
+        .copy-btn:hover { background: #115293; }
+        textarea { width: 100%; height: 120px; margin-top: 10px; border-radius: 6px; border: 1px solid #ccc; padding: 10px; font-family: monospace; font-size: 13px; box-sizing: border-box; }
+    </style>
 </head>
 <body>
 
-    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
-    <video id="bg-video" autoplay muted playsinline loop></video>
-    <div class="video-overlay"></div>
-
-    <div id="scrim" class="scrim"></div>
-
-    <nav id="navDrawer" class="nav-drawer">
-        <div class="drawer-header">เมนูการใช้งาน</div>
-        <ul class="drawer-menu">
-            <li><a href="menu.html">🏠 กลับหน้าเลือกฟังก์ชั่น</a></li>
-            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
-            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
-        </ul>
-    </nav>
-
-    <div class="topbar">
-        <button id="hamburgerBtn" class="hamburger-btn">☰</button>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
-        <div>
-            <h1>รายการอะไหล่เช็กระยะ MG</h1>
-            <span>Accessory Copy Tool</span>
+<div class="container">
+    <h1>🚘 ตารางคำนวณและสรุปค่าบริการเช็กระยะ MG</h1>
+    
+    <div class="form-group">
+        <div class="form-control">
+            <label for="carModel">เลือกรุ่นรถ:</label>
+            <select id="carModel" onchange="calculateService()">
+                <option value="NEW_MG_ZS">New MG ZS</option>
+                <option value="MG_ZS_EV">MG ZS EV</option>
+                <option value="NEW_MG_ZS_EV">New MG ZS EV</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <label for="serviceKm">เลือกรอบเช็กระยะ (กม.):</label>
+            <select id="serviceKm" onchange="calculateService()"></select>
         </div>
     </div>
 
-    <div class="container">
-        <div class="selector-card">
-            <div class="select-group">
-                <label for="carModelSelect">🚗 เลือกรุ่นรถ:</label>
-                <select id="carModelSelect">
-                    <option value="">-- เลือกรุ่นรถ --</option>
-                </select>
-            </div>
+    <div class="card">
+        <h3 style="margin-top:0;">🛠️ รายการอะไหล่และของเหลวที่ต้องเปลี่ยน</h3>
+        <table id="partsTable">
+            <thead>
+                <tr>
+                    <th>เบอร์อะไหล่</th>
+                    <th>รายการอะไหล่</th>
+                    <th class="text-center">จำนวน</th>
+                    <th class="text-right">ราคา/หน่วย</th>
+                    <th class="text-right">ราคารวม</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-            <div class="select-group">
-                <label for="mileageSelect">⏱️ รอบเช็กระยะ:</label>
-                <select id="mileageSelect" disabled>
-                    <option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>
-                </select>
-            </div>
-        </div>
-
-        <div class="result-card">
-            <div id="displayArea" class="empty-state">
-                กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่
-            </div>
+        <div class="total-box">
+            <div class="total-row"><span>รวมค่าอะไหล่:</span><span id="partsTotal">0.00 บาท</span></div>
+            <div class="total-row"><span>ค่าแรงบริการ:</span><span id="labourTotal">0.00 บาท</span></div>
+            <div class="total-row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span id="vatTotal">0.00 บาท</span></div>
+            <div class="total-row grand"><span>รวมสุทธิทั้งสิ้น:</span><span id="grandTotal">0.00 บาท</span></div>
         </div>
     </div>
 
-    <div id="toast" class="toast">คัดลอกรายการแล้ว!</div>
+    <div class="card">
+        <h3 style="margin-top:0;">📋 ข้อความสำหรับคัดลอก (Copy Text)</h3>
+        <textarea id="copyText" readonly></textarea>
+        <button class="copy-btn" onclick="copyToClipboard()">📋 คัดลอกข้อความสรุป</button>
+    </div>
+</div>
 
 <script>
-// =========================================================================
-// 📌 รายชื่อรุ่นรถตรงตาม Google Drive ของคุณ
-// (นำ File ID จาก Google Sheets แต่ละไฟล์มาวางในสัญลักษณ์ "" ได้เลยครับ)
-// =========================================================================
-const carModelFiles = {
-    "MG V80": "1Zf0Et-VbMcbnYcCrCBy6hODGGTALarM1wy1zw8tfCNg",
-    "MG MAXUS 7": "",
-    "MG MAXUS 9": "",
-    "MG GS 2.0T": "",
-    "MG GS 1.5T": "",
-    "MG ZS": "",
-    "MG ZS EV": "",
-    "NEW MG 5": "",
-    "NEW MG 6": "",
-    "NEW MG HS": "",
-    "NEW MG HS PHEV": "",
-    "NEW MG IM6-IM5": "",
-    "NEW MG S5 EV": "",
-    "NEW MG VS HEV": "",
-    "NEW MG ZS": "",
-    "NEW MG ZS EV": "",
-    "MG3": "",
-    "ALL NEW MG3": "",
-    "MG5 NON TURBO": "",
-    "MG5 TURBO": ""
+// ข้อมูลฐานระบบตามตาราง
+const masterData = {
+    parts: {
+        "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 (4L)", unit: 1, price: 1495 },
+        "11486328": { name: "ไส้กรองน้ำมันเครื่อง", unit: 1, price: 240 },
+        "ALU1403": { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", unit: 1, price: 12 },
+        "G00000362": { name: "ไส้กรองอากาศ", unit: 1, price: 355 },
+        "G00000266": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5", unit: 1, price: 590 },
+        "G00000356": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5 (EV)", unit: 1, price: 590 },
+        "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร", unit: 1, price: 790 },
+        "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร", unit: 1, price: 195 },
+        "G00000459": { name: "น้ำมันเบรก 1 ลิตร", unit: 1, price: 498 },
+        "10137065": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (ZS EV)", unit: 2, price: 1175 },
+        "10925167": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (New ZS EV)", unit: 1, price: 1500 },
+        "10004211": { name: "แหวนรองเติมน้ำมันเกียร์", unit: 1, price: 3 },
+        "10064941": { name: "แหวนถ่ายน้ำมันเกียร์", unit: 1, price: 9 },
+        "10471721": { name: "น้ำมันเกียร์อัตโนมัติ CVT 1 ลิตร", unit: 4, price: 425 },
+        "10407695": { name: "แหวนรองเติมน้ำมันเกียร์ CVT", unit: 1, price: 7 },
+        "10811222": { name: "แหวนถ่ายน้ำมันเกียร์ CVT", unit: 1, price: 9 },
+        "10501598": { name: "ปลั๊กถ่ายน้ำมันเกียร์", unit: 1, price: 16 },
+        "10406912": { name: "ไส้กรองน้ำมันเกียร์", unit: 1, price: 350 },
+        "10406973": { name: "ไส้กรองเครื่องกรองแรงดันต่ำเกียร์", unit: 1, price: 170 },
+        "10412354": { name: "โอริ่งไส้กรองเครื่องกรองแรงดันเกียร์", unit: 1, price: 9 },
+        "11446616": { name: "หัวเทียน", unit: 4, price: 165 },
+        "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง", unit: 1, price: 235 },
+        "10202623": { name: "สายพานขับหน้าเครื่อง", unit: 1, price: 410 }
+    },
+    schedules: {
+        "NEW_MG_ZS": {
+            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
+            labourRatePerHour: 750,
+            labourHours: { 10000:1.5, 20000:1.5, 30000:2.2, 40000:2.4, 50000:1.5, 60000:3.0, 70000:1.5, 80000:3.3, 90000:2.2, 100000:2.5, 110000:1.5, 120000:4.5, 130000:1.5, 140000:1.5, 150000:2.2, 160000:3.3, 170000:1.5, 180000:3.0, 190000:1.5, 200000:3.4, 210000:2.2, 220000:1.5, 230000:1.5, 240000:5.4, 250000:1.5, 260000:1.5, 270000:2.2, 280000:2.4, 290000:1.5, 300000:4.0 },
+            getParts: (km) => {
+                let list = ["10134155", "11486328", "ALU1403"];
+                if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("G00000362");
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266");
+                if ([100000, 200000, 300000].includes(km)) list.push("10189906", "10196876");
+                if ([60000, 120000, 180000, 240000, 300000].includes(km)) list.push("G00000459");
+                if ([80000, 160000, 240000].includes(km)) list.push("10471721", "10407695", "10811222", "10501598", "10406912", "10406973", "10412354");
+                if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("11446616");
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("10137854");
+                if ([120000, 240000].includes(km)) list.push("10202623");
+                return list;
+            }
+        },
+        "MG_ZS_EV": {
+            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
+            labourRatePerHour: 750,
+            labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
+            getParts: (km) => {
+                let list = [];
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266", "G00000459");
+                if ([80000, 160000, 240000].includes(km)) list.push("10189906", "10196876", "10137065", "10004211", "10064941");
+                return list;
+            }
+        },
+        "NEW_MG_ZS_EV": {
+            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
+            labourRatePerHour: 750,
+            labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
+            getParts: (km) => {
+                let list = [];
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000356", "G00000459");
+                if ([80000, 160000, 240000].includes(km)) list.push("10189906", "10196876", "10925167", "10004211", "10064941");
+                return list;
+            }
+        }
+    }
 };
 
-let currentFileData = {};
-
-const carModelSelect = document.getElementById('carModelSelect');
-const mileageSelect = document.getElementById('mileageSelect');
-const displayArea = document.getElementById('displayArea');
-const toast = document.getElementById('toast');
-
-// 1. โหลดรายชื่อรุ่นรถใส่ Dropdown
-function initModelDropdown() {
-    carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
-    Object.keys(carModelFiles).forEach(model => {
-        const opt = document.createElement('option');
-        opt.value = model;
-        opt.textContent = model;
-        carModelSelect.appendChild(opt);
-    });
+// เติมตัวเลือกระยะทาง 10,000 - 300,000 กม.
+const kmSelect = document.getElementById('serviceKm');
+for (let km = 10000; km <= 300000; km += 10000) {
+    let opt = document.createElement('option');
+    opt.value = km;
+    opt.textContent = `${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)`;
+    kmSelect.appendChild(opt);
 }
 
-// 2. ดึงข้อมูล CSV ของรุ่นที่เลือก
-carModelSelect.addEventListener('change', async function() {
-    const selectedModel = this.value;
-    mileageSelect.innerHTML = '<option value="">-- กำลังโหลดข้อมูล... --</option>';
-    mileageSelect.disabled = true;
-    displayArea.innerHTML = '<div class="empty-state">กำลังดึงข้อมูลตารางเช็กระยะ...</div>';
+function calculateService() {
+    const modelKey = document.getElementById('carModel').value;
+    const km = parseInt(document.getElementById('serviceKm').value);
+    const modelData = masterData.schedules[modelKey];
+    
+    const partKeys = modelData.getParts(km);
+    const tbody = document.querySelector('#partsTable tbody');
+    tbody.innerHTML = '';
+    
+    let partsTotal = 0;
+    let summaryTextParts = [];
 
-    if (!selectedModel) {
-        mileageSelect.innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
-        displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
-        return;
-    }
+    if (partKeys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#777;">ไม่มีรายการเปลี่ยนอะไหล่ในรอบนี้ (ตรวจเช็กตามระยะฟรี/ปกติ)</td></tr>`;
+    } else {
+        partKeys.forEach((key, idx) => {
+            const item = masterData.parts[key];
+            const itemTotal = item.price * item.unit;
+            partsTotal += itemTotal;
 
-    const fileId = carModelFiles[selectedModel];
-
-    if (!fileId) {
-        displayArea.innerHTML = `<div class="empty-state">ยังไม่ได้ใส่ File ID สำหรับรุ่น <b>${selectedModel}</b><br><small>(นำ File ID จาก Google Sheet มาใส่ในตัวแปร carModelFiles ในโค้ด)</small></div>`;
-        mileageSelect.innerHTML = '<option value="">-- ไม่พบไฟล์ข้อมูล --</option>';
-        return;
-    }
-
-    const fileUrl = `https://docs.google.com/spreadsheets/d/${fileId}/export?format=csv`;
-
-    try {
-        const response = await fetch(fileUrl);
-        if (!response.ok) throw new Error('ไม่สามารถเข้าถึงไฟล์ได้');
-        const csvText = await response.text();
-        
-        parseSingleModelCSV(csvText);
-        populateMileageDropdown();
-    } catch (err) {
-        console.error("Error loading file:", err);
-        displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการดึงข้อมูล<br><small>กรุณาตรวจสอบว่าเปิดสิทธิ์ Google Sheet ให้เป็น "ทุกคนที่มีลิงก์" แล้วหรือยัง</small></div>';
-        mileageSelect.innerHTML = '<option value="">-- เกิดข้อผิดพลาด --</option>';
-    }
-});
-
-// 3. แปลง CSV เป็น Object ข้อมูล
-function parseSingleModelCSV(csvText) {
-    currentFileData = {};
-    const lines = csvText.split(/\r?\n/);
-    let currentMileage = "รายการทั่วไป / ทุกระยะ";
-
-    lines.forEach(line => {
-        const trimmed = line.trim();
-        if (!trimmed) return;
-
-        const cols = trimmed.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
-        const fullText = cols.join(' ');
-
-        if (fullText.includes("กม.") || fullText.includes("Km") || fullText.includes("เดือน") || fullText.includes("ระยะ")) {
-            const mileageText = cols[0] || cols[1] || "";
-            if (mileageText && !mileageText.includes("Part no") && !mileageText.includes("เบอร์อะไหล่")) {
-                currentMileage = mileageText;
-                if (!currentFileData[currentMileage]) {
-                    currentFileData[currentMileage] = [];
-                }
-            }
-        }
-        else if (cols.length >= 2) {
-            const partNo = cols[0];
-            const partName = cols[1];
-            const price = cols[2] || "-";
-
-            const isHeader = partNo.includes("เบอร์อะไหล่") || partNo.includes("Part no") || 
-                             partNo.includes("Service Distance") || partNo.includes("เดือนที่") || partNo.includes("ตาราง");
-
-            if (partNo && partName && !isHeader) {
-                if (!currentFileData[currentMileage]) {
-                    currentFileData[currentMileage] = [];
-                }
-
-                currentFileData[currentMileage].push({
-                    partNo: partNo,
-                    name: partName,
-                    price: price
-                });
-            }
-        }
-    });
-}
-
-// 4. แสดงรอบเช็กระยะ
-function populateMileageDropdown() {
-    const mileages = Object.keys(currentFileData);
-
-    if (mileages.length === 0) {
-        mileageSelect.innerHTML = '<option value="">-- ไม่พบข้อมูลรอบระยะในไฟล์ --</option>';
-        displayArea.innerHTML = '<div class="empty-state">ไม่พบรายการอะไหล่ในไฟล์นี้</div>';
-        return;
-    }
-
-    mileageSelect.disabled = false;
-    mileageSelect.innerHTML = '<option value="">-- เลือกรอบเช็กระยะ --</option>';
-    mileages.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = m;
-        mileageSelect.appendChild(opt);
-    });
-
-    displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
-}
-
-// 5. แสดงรายการเมื่อเลือกรอบระยะ
-mileageSelect.addEventListener('change', function() {
-    const mileage = this.value;
-    if (!mileage) return;
-
-    const items = currentFileData[mileage];
-
-    if (items && items.length > 0) {
-        let html = '<div class="item-list">';
-        items.forEach(item => {
-            html += `
-                <div class="item-row" onclick="copyText('${item.partNo} ${item.name}', this)">
-                    <div>
-                        <div style="font-weight:600;">${item.name}</div>
-                        <div class="part-no">Part No: ${item.partNo}</div>
-                    </div>
-                    <div style="font-weight:bold; color:#e53e3e;">${item.price} ${item.price !== '-' ? '฿' : ''}</div>
-                </div>
+            tbody.innerHTML += `
+                <tr>
+                    <td>${key}</td>
+                    <td>${item.name}</td>
+                    <td class="text-center">${item.unit}</td>
+                    <td class="text-right">${item.price.toLocaleString('.2f')}</td>
+                    <td class="text-right">${itemTotal.toLocaleString('.2f')}</td>
+                </tr>
             `;
+            summaryTextParts.push(`${idx + 1}. ${item.name} x${item.unit} = ${itemTotal.toLocaleString()} บาท`);
         });
-        html += '</div>';
-        displayArea.innerHTML = html;
-    } else {
-        displayArea.innerHTML = `<div class="empty-state">ไม่พบรายการอะไหล่ในระยะนี้</div>`;
-    }
-});
-
-// คัดลอกข้อความ
-let lastActiveRow = null;
-function copyText(text, element) {
-    if (navigator.clipboard && window.isSecureContext) {
-        navigator.clipboard.writeText(text);
-    } else {
-        const textarea = document.createElement("textarea");
-        textarea.value = text;
-        textarea.style.position = "fixed";
-        textarea.style.opacity = "0";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        document.body.removeChild(textarea);
     }
 
-    if (lastActiveRow) lastActiveRow.classList.remove('active');
-    element.classList.add('active');
-    lastActiveRow = element;
+    // คำนวณค่าแรง
+    const hours = modelData.labourHours[km] || 0;
+    const isFree = modelData.labourFreeKm.includes(km);
+    const labourCost = isFree ? 0 : (hours * modelData.labourRatePerHour);
 
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
+    // ภาษีและราคารวม
+    const subtotal = partsTotal + labourCost;
+    const vat = subtotal * 0.07;
+    const grandTotal = subtotal + vat;
+
+    // แสดงผล
+    document.getElementById('partsTotal').innerText = `${partsTotal.toFixed(2)} บาท`;
+    document.getElementById('labourTotal').innerText = isFree ? `ฟรี (${hours} ชม.)` : `${labourCost.toFixed(2)} บาท (${hours} ชม.)`;
+    document.getElementById('vatTotal').innerText = `${vat.toFixed(2)} บาท`;
+    document.getElementById('grandTotal').innerText = `${grandTotal.toFixed(2)} บาท`;
+
+    // สร้างข้อความ Text สรุปสำหรับคัดลอก
+    const modelName = document.getElementById('carModel').options[document.getElementById('carModel').selectedIndex].text;
+    let copyStr = `รายการเช็กระยะ ${modelName} - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
+    copyStr += `----------------------------------------\n`;
+    if (summaryTextParts.length > 0) {
+        copyStr += summaryTextParts.join('\n') + `\n`;
+    } else {
+        copyStr += `ไม่มีรายการเปลี่ยนอะไหล่ (ตรวจเช็กระยะอย่างเดียว)\n`;
+    }
+    copyStr += `----------------------------------------\n`;
+    copyStr += `รวมค่าอะไหล่: ${partsTotal.toLocaleString('.2f')} บาท\n`;
+    copyStr += `ค่าแรงบริการ: ${isFree ? 'ฟรี' : labourCost.toLocaleString('.2f') + ' บาท'}\n`;
+    copyStr += `ภาษีมูลค่าเพิ่ม (7%): ${vat.toLocaleString('.2f')} บาท\n`;
+    copyStr += `ยอดรวมสุทธิ: ${grandTotal.toLocaleString('.2f')} บาท`;
+
+    document.getElementById('copyText').value = copyStr;
 }
 
-// Side Drawer Menu
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const navDrawer = document.getElementById('navDrawer');
-const scrim = document.getElementById('scrim');
-
-function toggleDrawer() {
-    navDrawer.classList.toggle('open');
-    scrim.classList.toggle('active');
+function copyToClipboard() {
+    const copyText = document.getElementById("copyText");
+    copyText.select();
+    document.execCommand("copy");
+    alert("คัดลอกข้อความสรุปเรียบร้อยแล้ว!");
 }
-hamburgerBtn.addEventListener('click', toggleDrawer);
-scrim.addEventListener('click', toggleDrawer);
 
-document.getElementById('logoutBtn').addEventListener('click', () => window.location.href = 'index.html');
-
-// เริ่มต้นระบบ
-window.addEventListener('DOMContentLoaded', initModelDropdown);
+// เรียกคำนวณครั้งแรก
+calculateService();
 </script>
+
 </body>
 </html>
