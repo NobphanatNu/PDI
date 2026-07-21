@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อะไหล่เช็กระยะ - Accessory Copy Tool</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
+  
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Sarabun', Arial, sans-serif;
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #0d0d11 !important;
+  overflow: hidden;
+  font-size: 16px;
+}
+
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน ===== */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: -1;
+}
+
+/* ===== แถบด้านบน (Top Bar) ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 999;
+}
+
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.1);
+}
+
+.topbar img {
+  width: 120px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
+}
+
+.topbar h1 {
+  color: #fff;
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.topbar span {
+  color: rgba(255, 233, 233, 0.9);
+  font-size: 14px;
+  display: block;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+.btn-logout {
+  padding: 8px 16px;
+  background-color: #e53e3e;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.btn-logout:hover {
+  background-color: #c53030;
+  transform: translateY(-2px);
+}
+
+/* ===== Hamburger Menu ===== */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scrim.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: rgba(20, 20, 28, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  z-index: 9999;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.nav-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.drawer-menu {
+  list-style: none;
+  padding: 15px 0;
+  margin: 0;
+  flex: 1;
+}
+
+.drawer-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 14px 25px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.drawer-menu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding-left: 30px;
+}
+
+/* ===== ส่วนคัดเลือกและเนื้อหา ===== */
+.main-wrapper {
+  margin-top: 70px;
+  height: calc(100vh - 70px);
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  gap: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* แถบตัวเลือก (Filter Dropdowns) */
+.filter-bar {
+  display: flex;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 15px 20px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.filter-group label {
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(30, 30, 40, 0.8);
+  color: #fff;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 15px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  border-color: #3b82f6;
+}
+
+/* คอลัมน์แสดงรายการ */
+.column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.category {
+  background: rgba(255, 255, 255, 0.06) !important;
+  padding: 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+h2 {
+  font-size: 20px;
+  margin-top: 0;
+  margin-bottom: 14px;
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* รายการปุ่ม */
+.item {
+  padding: 12px 16px;
+  margin: 8px 0;
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a1a1a;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.item:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  transform: translateX(6px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
+}
+
+.item.active {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  border-color: #3b82f6;
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.6);
+  transform: translateX(6px);
+}
+
+.price-tag {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.item.active .price-tag {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+.loading-text {
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  margin: 40px 0;
+}
+</style>
+</head>
+<body>
+
+    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+
+    <video id="bg-video" autoplay muted playsinline></video>
+    <div class="video-overlay"></div>
+
+    <div id="scrim" class="scrim"></div>
+
+    <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
+        <div class="drawer-header">เมนูการใช้งาน</div>
+        <ul class="drawer-menu">
+            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
+            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
+        </ul>
+    </nav>
+
+    <div class="topbar">
+        <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
+        <div>
+            <h1>รายการอะไหล่เช็กระยะ MG</h1>
+            <span>Accessory Copy Tool</span>
+        </div>
+    </div>
+
+    <div class="main-wrapper">
+        <!-- ตัวเลือก Filter -->
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="carModelSelect">🚗 เลือกรุ่นรถ:</label>
+                <select id="carModelSelect" class="filter-select">
+                    <option value="">-- กำลังโหลดรุ่นรถ --</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="mileageSelect">⏱️ รอบเช็กระยะ:</label>
+                <select id="mileageSelect" class="filter-select">
+                    <option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- รายการอะไหล่ที่จะแสดงผล -->
+        <div class="column">
+            <div class="category">
+                <h2 id="categoryTitle">🔧 อะไหล่ที่ต้องเปลี่ยนตามระยะ</h2>
+                <div id="itemsContainer">
+                    <div class="loading-text">🔄 กำลังโหลดข้อมูลจาก Google Sheets...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// ===== ID ตาราง Google Sheets ของคุณ =====
+const sheetId = "1Zf0Et-VbMcbnYcCrCBy6hODGGTALarM1wy1zw8tfCNg";
+const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv`;
+
+let sheetDataRaw = [];
+
+// ดึงข้อมูล CSV จาก Google Sheets
+async function loadSheetData() {
+  const itemsContainer = document.getElementById('itemsContainer');
+  try {
+    const res = await fetch(csvUrl);
+    const text = await res.text();
+    
+    // แปลง CSV เป็น Rows
+    const rows = text.split('\n').map(row => {
+      return row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(cell => cell.replace(/^"|"$/g, '').trim());
+    });
+
+    if(rows.length < 2) {
+      itemsContainer.innerHTML = '<div class="loading-text">ไม่พบข้อมูลใน Google Sheets</div>';
+      return;
+    }
+
+    sheetDataRaw = rows;
+    setupModelDropdown();
+
+  } catch (err) {
+    console.error(err);
+    itemsContainer.innerHTML = '<div class="loading-text">❌ ไม่สามารถดึงข้อมูลได้ โปรดตรวจสอบการแชร์ Google Sheets</div>';
+  }
+}
+
+// ตั้งค่า Dropdown รุ่นรถ (อ่านจาก คอลัมน์ A)
+function setupModelDropdown() {
+  const carModelSelect = document.getElementById('carModelSelect');
+  const models = new Set();
+
+  // วนลูปอ่านคอลัมน์ A (ข้าม Header)
+  for (let i = 1; i < sheetDataRaw.length; i++) {
+    const model = sheetDataRaw[i][0]; // คอลัมน์ A
+    if (model) models.add(model);
+  }
+
+  carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
+  models.forEach(model => {
+    const opt = document.createElement('option');
+    opt.value = model;
+    opt.innerText = model;
+    carModelSelect.appendChild(opt);
+  });
+
+  document.getElementById('itemsContainer').innerHTML = '<div class="loading-text">👈 กรุณาเลือกรุ่นรถและรอบเช็กระยะด้านบน</div>';
+}
+
+// ตั้งค่า Dropdown รอบระยะ (อ่านจาก คอลัมน์ B ให้ตรงกับรุ่นรถ)
+function setupMileageDropdown(selectedModel) {
+  const mileageSelect = document.getElementById('mileageSelect');
+  const mileages = new Set();
+
+  for (let i = 1; i < sheetDataRaw.length; i++) {
+    const model = sheetDataRaw[i][0];   // คอลัมน์ A
+    const mileage = sheetDataRaw[i][1]; // คอลัมน์ B
+    if (model === selectedModel && mileage) {
+      mileages.add(mileage);
+    }
+  }
+
+  mileageSelect.innerHTML = '<option value="">-- เลือกรอบเช็กระยะ --</option>';
+  mileages.forEach(mileage => {
+    const opt = document.createElement('option');
+    opt.value = mileage;
+    opt.innerText = mileage;
+    mileageSelect.appendChild(opt);
+  });
+}
+
+// แสดงรายการอะไหล่และราคา (คอลัมน์ C คือรายการ, D คือราคา)
+function displayItems(selectedModel, selectedMileage) {
+  const itemsContainer = document.getElementById('itemsContainer');
+  itemsContainer.innerHTML = '';
+
+  let count = 0;
+
+  for (let i = 1; i < sheetDataRaw.length; i++) {
+    const model = sheetDataRaw[i][0];   // คอลัมน์ A
+    const mileage = sheetDataRaw[i][1]; // คอลัมน์ B
+    const itemName = sheetDataRaw[i][2];// คอลัมน์ C
+    const price = sheetDataRaw[i][3];   // คอลัมน์ D
+
+    if (model === selectedModel && mileage === selectedMileage && itemName) {
+      count++;
+      const itemDiv = document.createElement('div');
+      itemDiv.className = 'item';
+      
+      const priceText = price ? ` ฿${price}` : '';
+      itemDiv.setAttribute('data-copy', `${itemName}${priceText}`);
+
+      itemDiv.innerHTML = `
+        <span>${itemName}</span>
+        ${price ? `<span class="price-tag">${price} บาท</span>` : ''}
+      `;
+
+      itemDiv.onclick = function() { copy(this); };
+      itemsContainer.appendChild(itemDiv);
+    }
+  }
+
+  if (count === 0) {
+    itemsContainer.innerHTML = '<div class="loading-text">ไม่พบรายการอะไหล่ในรอบระยะนี้</div>';
+  }
+}
+
+// Event Listeners เมื่อเลือก Dropdown
+document.getElementById('carModelSelect').addEventListener('change', function() {
+  const selectedModel = this.value;
+  if (selectedModel) {
+    setupMileageDropdown(selectedModel);
+    document.getElementById('itemsContainer').innerHTML = '<div class="loading-text">👈 กรุณาเลือกรอบเช็กระยะเพิ่มเติม</div>';
+  } else {
+    document.getElementById('mileageSelect').innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
+    document.getElementById('itemsContainer').innerHTML = '<div class="loading-text">👈 กรุณาเลือกรุ่นรถและรอบเช็กระยะด้านบน</div>';
+  }
+});
+
+document.getElementById('mileageSelect').addEventListener('change', function() {
+  const selectedModel = document.getElementById('carModelSelect').value;
+  const selectedMileage = this.value;
+  if (selectedModel && selectedMileage) {
+    displayItems(selectedModel, selectedMileage);
+  }
+});
+
+// ===== Hamburger Menu =====
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navDrawer = document.getElementById('navDrawer');
+const scrim = document.getElementById('scrim');
+
+function toggleDrawer() {
+    const isOpen = navDrawer.classList.contains('open');
+    if (isOpen) {
+        navDrawer.classList.remove('open');
+        scrim.classList.remove('active');
+        navDrawer.setAttribute('aria-expanded', 'false');
+    } else {
+        navDrawer.classList.add('open');
+        scrim.classList.add('active');
+        navDrawer.setAttribute('aria-expanded', 'true');
+    }
+}
+
+hamburgerBtn.addEventListener('click', toggleDrawer);
+scrim.addEventListener('click', toggleDrawer);
+
+// ===== ควบคุมวิดีโอพื้นหลัง =====
+const videoSources = [
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
+  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
+];
+
+let currentVideoIndex = 0;
+const videoPlayer = document.getElementById("bg-video");
+
+function playNextVideo() {
+  if (!videoPlayer || videoSources.length === 0) return;
+  videoPlayer.src = videoSources[currentVideoIndex];
+  videoPlayer.load();
+  videoPlayer.play().catch(() => setTimeout(playNextVideo, 1000));
+  currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+}
+
+if (videoPlayer) {
+  videoPlayer.addEventListener("ended", playNextVideo);
+  videoPlayer.addEventListener("error", playNextVideo);
+}
+
+// ===== ฟังก์ชั่น Copy =====
+let lastActive = null;
+
+function copy(el) {
+  const text = el.getAttribute('data-copy');
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+
+  if (lastActive) lastActive.classList.remove("active");
+  el.classList.add("active");
+  lastActive = el;
+}
+
+function fallbackCopy(text) {
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.appendChild(textarea);
+  textarea.select();
+  try { document.execCommand("copy"); } catch (err) {}
+  document.body.removeChild(textarea);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  playNextVideo();
+  loadSheetData();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    window.location.href = 'index.html';
+});
+</script>
+
+</body>
+</html>
