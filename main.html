@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>รายการอุปกรณ์รถ - Accessory Copy Tool</title>
 
 <style>
@@ -23,7 +24,7 @@ body {
   font-size: 16px;
 }
 
-/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน (Layer -2 และ -1) ===== */
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน ===== */
 #bg-video {
   position: fixed;
   inset: 0;
@@ -36,11 +37,11 @@ body {
 .video-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45); /* แผ่นฟิล์มดำช่วยดันให้มิติกล่องกระจกเด่นชัดขึ้น */
+  background: rgba(0, 0, 0, 0.45);
   z-index: -1;
 }
 
-/* ===== แถบด้านบน (Top Bar) สีแดงโปร่งแสงหรูหราเข้าชุด ===== */
+/* ===== แถบด้านบน (Top Bar) ===== */
 .topbar {
   position: fixed;
   top: 0;
@@ -55,7 +56,26 @@ body {
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  z-index: 9999;
+  z-index: 999;
+}
+
+/* ปุ่ม Hamburger Icon */
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  transform: scale(1.1);
 }
 
 .topbar img {
@@ -81,7 +101,7 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== ปุ่มกลับหน้าหลัก/ออกจากระบบ ด้านขวาบน ===== */
+/* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
 .btn-logout {
   padding: 8px 16px;
   background-color: #e53e3e;
@@ -94,11 +114,10 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-  
   position: fixed;
   top: 16px;
   right: 20px;
-  z-index: 99999;
+  z-index: 1000;
 }
 
 .btn-logout:hover {
@@ -111,7 +130,76 @@ body {
   transform: translateY(0px);
 }
 
-/* ===== ส่วนควบคุมเนื้อหาหลัก จัดกึ่งกลางยืดเต็มจอปกติ ===== */
+/* ===== Hamburger Menu (Nav Drawer Side Panel) ===== */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.scrim.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: rgba(20, 20, 28, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  z-index: 9999;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
+
+.nav-drawer.open {
+  left: 0;
+}
+
+.drawer-header {
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.drawer-menu {
+  list-style: none;
+  padding: 15px 0;
+  margin: 0;
+  flex: 1;
+}
+
+.drawer-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 14px 25px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.drawer-menu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding-left: 30px;
+}
+
+/* ===== ส่วนควบคุมเนื้อหาหลัก ===== */
 .container {
   margin-top: 70px;
   height: calc(100vh - 70px);
@@ -126,7 +214,7 @@ body {
   z-index: 1;
 }
 
-/* ===== คอลัมน์แบบกระจกใส โปร่งแสงมีมิติมากขึ้น ===== */
+/* ===== คอลัมน์แบบกระจกใส ===== */
 .column {
   flex: 1;
   display: flex;
@@ -141,7 +229,6 @@ body {
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
 }
 
-/* ปรับแต่งความสวยงามของแถบเลื่อน (Scrollbar) ให้เข้ากับยุคสมัยกระจกใส */
 .column::-webkit-scrollbar {
   width: 6px;
 }
@@ -157,7 +244,7 @@ body {
   background: rgba(255, 255, 255, 0.4);
 }
 
-/* ===== กล่องหมวดหมู่ย่อยด้านใน ปรับให้เข้ากับธีมมืดใส ===== */
+/* ===== กล่องหมวดหมู่ย่อย ===== */
 .category {
   background: rgba(255, 255, 255, 0.06) !important;
   padding: 18px;
@@ -166,7 +253,6 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* เปลี่ยนสีหัวข้อเป็นสีขาวสว่าง ดึงสายตาชัดเจน */
 h2 {
   font-family: 'Sarabun', Arial, sans-serif;
   font-size: 20px;
@@ -198,7 +284,6 @@ h2 {
   box-shadow: 0 4px 12px rgba(255, 255, 255, 0.2);
 }
 
-/* ไฮไลท์ปุ่มสีฟ้า เมื่อก๊อปปี้สำเร็จ */
 .item.active {
   background: #3b82f6 !important;
   color: #ffffff !important;
@@ -208,20 +293,35 @@ h2 {
   transform: translateX(6px);
 }
 </style>
-
 </head>
 <body>
 
-    <!-- ปุ่มออกจากระบบกลับไปหน้าล็อกอิน -->
+    <!-- ปุ่มออกจากระบบ -->
     <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
 
-    <!-- เครื่องเล่นวิดีโอพื้นหลังต่อเนื่อง -->
+    <!-- วิดีโอพื้นหลัง -->
     <video id="bg-video" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
 
-    <!-- แถบเมนูด้านบนโปร่งแสงกระจกสีแดงแบรนด์ ABLE -->
+    <!-- Scrim (แผ่นเงาเมื่อสไลด์เปิดเมนู) -->
+    <div id="scrim" class="scrim"></div>
+
+    <!-- Hamburger Nav Drawer ด้านข้าง -->
+    <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
+        <div class="drawer-header">เมนูการใช้งาน</div>
+        <ul class="drawer-menu">
+            <li><a href="menu.html">🏠 กลับหน้าเลือกฟังก์ชั่น</a></li>
+            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
+            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
+        </ul>
+    </nav>
+
+    <!-- แถบ Topbar -->
     <div class="topbar">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10">
+        <!-- ปุ่ม Hamburger -->
+        <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
+        
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
         <div>
             <h1>รายการอุปกรณ์รถ MG</h1>
             <span>Accessory Copy Tool</span>
@@ -299,7 +399,7 @@ h2 {
                 <div class="item" onclick="copy(this)">พรม 6D (H03)</div>
                 <div class="item" onclick="copy(this)">พรม 6D (H16)สีน้ำตาลอ่อน-ครีม</div>
                 <div class="item" onclick="copy(this)">พรม 6D (E16)น้ำตาลอ่อนด้ายดำ</div>
-                <div class="item" onclick="copy(this)">พrom 6D (D01) สีกาแฟด้ายครีม</div>
+                <div class="item" onclick="copy(this)">พรม 6D (D01) สีกาแฟด้ายครีม</div>
                 <div class="item" onclick="copy(this)">พรม 6D (D02) สีดำด้ายแดง</div>
                 <div class="item" onclick="copy(this)">พรม 6D (A04) น้ำตาลเข้ม</div>
                 <div class="item" onclick="copy(this)">ถาดท้าย</div>
@@ -360,8 +460,29 @@ h2 {
 
     </div>
 
-<!-- JavaScript ควบคุมจัดการระบบวิดีโอและระบบคัดลอกดั้งเดิมทั้งหมด -->
 <script>
+// ===== JavaScript ควบคุม Hamburger Menu (Nav Drawer) =====
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navDrawer = document.getElementById('navDrawer');
+const scrim = document.getElementById('scrim');
+
+function toggleDrawer() {
+    const isOpen = navDrawer.classList.contains('open');
+    if (isOpen) {
+        navDrawer.classList.remove('open');
+        scrim.classList.remove('active');
+        navDrawer.setAttribute('aria-expanded', 'false');
+    } else {
+        navDrawer.classList.add('open');
+        scrim.classList.add('active');
+        navDrawer.setAttribute('aria-expanded', 'true');
+    }
+}
+
+hamburgerBtn.addEventListener('click', toggleDrawer);
+scrim.addEventListener('click', toggleDrawer);
+
+// ===== ควบคุมวิดีโอพื้นหลัง =====
 const videoSources = [
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
   "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
@@ -392,7 +513,7 @@ if (videoPlayer) {
 
 window.addEventListener("DOMContentLoaded", playNextVideo);
 
-// ระบบฟังก์ชั่นการกด Copy
+// ===== ฟังก์ชั่นการกด Copy =====
 let lastActive = null;
 
 function copy(el) {
@@ -431,7 +552,7 @@ function fallbackCopy(text) {
   document.body.removeChild(textarea);
 }
 
-// สั่งการเมื่อมีการกดปุ่มออกจากระบบ
+// สั่งการเมื่อกดปุ่ม Log out
 document.getElementById('logoutBtn').addEventListener('click', function() {
     window.location.href = 'index.html';
 });
