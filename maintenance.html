@@ -38,7 +38,6 @@ body {
   z-index: -1;
 }
 
-/* Header Topbar */
 .topbar {
   position: fixed;
   top: 0; left: 0; right: 0;
@@ -69,7 +68,6 @@ body {
   cursor: pointer; position: fixed; top: 16px; right: 20px; z-index: 1000;
 }
 
-/* Nav Drawer */
 .scrim {
   position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6);
   z-index: 9998; opacity: 0; pointer-events: none; transition: opacity 0.3s;
@@ -88,14 +86,12 @@ body {
 .drawer-menu li a { display: block; padding: 14px 25px; color: #fff; text-decoration: none; }
 .drawer-menu li a:hover { background: rgba(255, 255, 255, 0.1); }
 
-/* Main Container */
 .container {
   margin-top: 70px; height: calc(100vh - 70px);
   width: 100%; max-width: 1200px; margin-left: auto; margin-right: auto;
   padding: 20px; display: flex; flex-direction: column; gap: 20px;
 }
 
-/* Selector Box */
 .selector-card {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -116,7 +112,6 @@ select {
 }
 select:focus { border-color: #e53e3e; }
 
-/* Display Results Table Card */
 .result-card {
   flex: 1; background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -166,12 +161,11 @@ select:focus { border-color: #e53e3e; }
     </div>
 
     <div class="container">
-        <!-- แถบเลือกรุ่นรถ และรอบระยะ -->
         <div class="selector-card">
             <div class="select-group">
                 <label for="carModelSelect">🚗 เลือกรุ่นรถ:</label>
                 <select id="carModelSelect">
-                    <option value="">-- เลือกรุ่นรถ --</option>
+                    <option value="">-- กำลังโหลดข้อมูลตาราง... --</option>
                 </select>
             </div>
 
@@ -183,7 +177,6 @@ select:focus { border-color: #e53e3e; }
             </div>
         </div>
 
-        <!-- การแสดงผลตารางรายการอะไหล่ -->
         <div class="result-card">
             <div id="displayArea" class="empty-state">
                 กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่
@@ -192,49 +185,95 @@ select:focus { border-color: #e53e3e; }
     </div>
 
 <script>
-// ===== 1. ตัวแปรเก็บข้อมูลรายชื่อรุ่นรถแบบสะอาด =====
-// (คุณสามารถเพิ่ม-ลด รายชื่อรุ่นรถตรงนี้ได้ตามต้องการ)
-const carModelsList = [
-    "MG V80",
-    "MG ZS",
-    "MG ZS EV",
-    "MG3",
-    "MG5",
-    "MG6",
-    "MG HS",
-    "MG HS PHEV",
-    "MG EP",
-    "MG4 Electric",
-    "MG MAXUS 9",
-    "MG CYBERSTER"
-];
+// ===== ใส่ Link ไฟล์ตาราง CSV หรือ Google Sheet (Export CSV) ตรงนี้ =====
+const DATA_SOURCE_URL = 'maintenance_data.csv'; 
 
-// ตัวอย่างฐานข้อมูลรายการอะไหล่ (แยกตามรุ่นและระยะ)
-const maintenanceData = {
-    "MG V80": {
-        "10,000 กม. / 6 เดือน": [
-            { partNo: "C00024950-1L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (1 ลิตร)", price: 280 },
-            { partNo: "C00024950-5L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (5 ลิตร)", price: 1350 },
-            { partNo: "C00014634", name: "ไส้กรองน้ำมันเครื่อง", price: 290 },
-            { partNo: "C00093495", name: "แหวนรองถ่ายน้ำมันเครื่อง", price: 30 }
-        ],
-        "20,000 กม. / 12 เดือน": [
-            { partNo: "C00024950-5L", name: "น้ำมันเครื่องสังเคราะห์ 10W40 (5 ลิตร)", price: 1350 },
-            { partNo: "C00014634", name: "ไส้กรองน้ำมันเครื่อง", price: 290 },
-            { partNo: "C00038469", name: "ไส้กรองน้ำมันเชื้อเพลิง", price: 650 },
-            { partNo: "C00093495", name: "แหวนรองถ่ายน้ำมันเครื่อง", price: 30 }
-        ]
+let parsedDatabase = {}; 
+
+// ===== ฟังก์ชั่นดึงและประมวลผลข้อมูลจากตาราง CSV =====
+async function loadTableData() {
+    try {
+        const response = await fetch(DATA_SOURCE_URL);
+        const rawText = await textCleaner(await response.text());
+        parseCSVToDataStructure(rawText);
+        populateModelDropdown();
+    } catch (err) {
+        console.error("ไม่สามารถโหลดไฟล์ตารางได้:", err);
+        // หากโหลดไฟล์ไม่สำเร็จ ใช้ระบบสำรองในการดึงรายการรุ่นรถ
+        displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการโหลดไฟล์ตารางข้อมูล กรุณาตรวจสอบไฟล์ maintenance_data.csv</div>';
     }
-};
+}
 
-// ===== 2. สคริปต์โหลด Dropdown รุ่นรถแบบถูกต้อง =====
+// ทำความสะอาดข้อความ ป้องกันการสับสนของวรรคหรือคอลัมน์
+function textCleaner(str) {
+    return str.replace(/\r/g, '');
+}
+
+// แปรรูปข้อมูล CSV เป็นโครงสร้าง { "ชื่อรุ่นรถ": { "รอบระยะ": [ รายการอะไหล่ ] } }
+function parseCSVToDataStructure(csvText) {
+    const lines = csvText.split('\n');
+    let currentModel = "";
+    let currentMileage = "";
+
+    lines.forEach(line => {
+        if (!line.trim()) return;
+
+        // แยกคอลัมน์ด้วยเครื่องหมาย comma
+        const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+
+        // ดึงเฉพาะแถวที่เป็นการระบุ "รุ่นรถ" (กรองคำขยะออก)
+        if (cols[0] && (cols[0].includes("MG") || cols[0].includes("รุ่น")) && !cols[0].includes("ตารางแสดง") && !cols[0].includes("Part no")) {
+            currentModel = cols[0].replace("ตารางเช็กระยะ", "").replace("Periodical Maintenance Table", "").trim();
+            if (!parsedDatabase[currentModel]) {
+                parsedDatabase[currentModel] = {};
+            }
+        } 
+        // ตรวจจับรอบระยะทาง (เช่น 10,000 km, 20,000 km, 6 เดือน ฯลฯ)
+        else if (cols[0] && (cols[0].includes("กม.") || cols[0].includes("Km") || cols[0].includes("เดือน"))) {
+            currentMileage = cols[0];
+            if (currentModel && !parsedDatabase[currentModel][currentMileage]) {
+                parsedDatabase[currentModel][currentMileage] = [];
+            }
+        }
+        // ตรวจจับรายการอะไหล่และรหัสสินค้า
+        else if (cols.length >= 2 && cols[0] && currentModel) {
+            const partNo = cols[0];
+            const partName = cols[1];
+            const price = cols[2] || "-";
+
+            // กรองคำหัวตารางออก
+            if (partNo !== "เบอร์อะไหล่" && partNo !== "Part no." && partName) {
+                // ถ้าระบุระยะไว้ ให้ลงกลุ่มระยะนั้น ถ้าไม่ได้ระบุ ให้ลงกลุ่มระยะล่าสุด
+                const targetMileage = currentMileage || "รายการทั่วไป / ทุกระยะ";
+                if (!parsedDatabase[currentModel][targetMileage]) {
+                    parsedDatabase[currentModel][targetMileage] = [];
+                }
+
+                parsedDatabase[currentModel][targetMileage].push({
+                    partNo: partNo,
+                    name: partName,
+                    price: price
+                });
+            }
+        }
+    });
+}
+
+// ===== เติมรายชื่อรุ่นรถที่คัดกรองแล้วลง Dropdown =====
 const carModelSelect = document.getElementById('carModelSelect');
 const mileageSelect = document.getElementById('mileageSelect');
 const displayArea = document.getElementById('displayArea');
 
-function initCarDropdown() {
+function populateModelDropdown() {
+    const models = Object.keys(parsedDatabase);
+
+    if (models.length === 0) {
+        carModelSelect.innerHTML = '<option value="">-- ไม่พบรายชื่อรุ่นรถในตาราง --</option>';
+        return;
+    }
+
     carModelSelect.innerHTML = '<option value="">-- เลือกรุ่นรถ --</option>';
-    carModelsList.forEach(model => {
+    models.forEach(model => {
         const opt = document.createElement('option');
         opt.value = model;
         opt.textContent = model;
@@ -242,50 +281,38 @@ function initCarDropdown() {
     });
 }
 
-// เมื่อเลือกรุ่นรถ -> ให้โหลดรอบระยะ
+// เมื่อเปลี่ยนรุ่นรถ -> อัปเดตรอบระยะ
 carModelSelect.addEventListener('change', function() {
     const selectedModel = this.value;
     mileageSelect.innerHTML = '';
-    
-    if (!selectedModel) {
+
+    if (!selectedModel || !parsedDatabase[selectedModel]) {
         mileageSelect.innerHTML = '<option value="">-- กรุณาเลือกรุ่นรถก่อน --</option>';
         mileageSelect.disabled = true;
         displayArea.innerHTML = '<div class="empty-state">กรุณาเลือกรุ่นรถและรอบระยะทาง เพื่อดูรายการอะไหล่</div>';
         return;
     }
 
+    const mileages = Object.keys(parsedDatabase[selectedModel]);
     mileageSelect.disabled = false;
     mileageSelect.innerHTML = '<option value="">-- เลือกรอบเช็กระยะ --</option>';
-    
-    // ดึงรอบระยะของรุ่นนั้นๆ (ถ้ามีข้อมูล)
-    const modelData = maintenanceData[selectedModel];
-    if (modelData) {
-        Object.keys(modelData).forEach(mileage => {
-            const opt = document.createElement('option');
-            opt.value = mileage;
-            opt.textContent = mileage;
-            mileageSelect.appendChild(opt);
-        });
-    } else {
-        // ระยะมาตรฐานทั่วไป หากยังไม่ได้ลงข้อมูลรายละเอียด
-        const defaultMileages = ["10,000 กม. / 6 เดือน", "20,000 กม. / 12 เดือน", "30,000 กม. / 18 เดือน", "40,000 กม. / 24 เดือน"];
-        defaultMileages.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m;
-            opt.textContent = m;
-            mileageSelect.appendChild(opt);
-        });
-    }
+
+    mileages.forEach(mileage => {
+        const opt = document.createElement('option');
+        opt.value = mileage;
+        opt.textContent = mileage;
+        mileageSelect.appendChild(opt);
+    });
 });
 
-// เมื่อเลือกรอบระยะ -> แสดงรายการอะไหล่
+// เมื่อเปลี่ยนรอบระยะ -> แสดงตารางอะไหล่
 mileageSelect.addEventListener('change', function() {
     const model = carModelSelect.value;
     const mileage = this.value;
 
     if (!model || !mileage) return;
 
-    const items = maintenanceData[model]?.[mileage];
+    const items = parsedDatabase[model]?.[mileage];
 
     if (items && items.length > 0) {
         let html = '<div class="item-list">';
@@ -296,18 +323,18 @@ mileageSelect.addEventListener('change', function() {
                         <div style="font-weight:600;">${item.name}</div>
                         <div class="part-no">Part No: ${item.partNo}</div>
                     </div>
-                    <div style="font-weight:bold; color:#e53e3e;">${item.price} ฿</div>
+                    <div style="font-weight:bold; color:#e53e3e;">${item.price} ${item.price !== '-' ? '฿' : ''}</div>
                 </div>
             `;
         });
         html += '</div>';
         displayArea.innerHTML = html;
     } else {
-        displayArea.innerHTML = `<div class="empty-state">ยังไม่มีข้อมูลตารางเช็กระยะสำหรับ ${model} (${mileage})</div>`;
+        displayArea.innerHTML = `<div class="empty-state">ไม่พบรายการอะไหล่ในระยะนี้</div>`;
     }
 });
 
-// ฟังก์ชั่น คัดลอก (Copy)
+// ฟังก์ชั่นกด Copy
 let lastActiveRow = null;
 function copyText(text, element) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -328,7 +355,7 @@ function copyText(text, element) {
     lastActiveRow = element;
 }
 
-// Nav Drawer Controller
+// Nav Drawer
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -342,8 +369,8 @@ scrim.addEventListener('click', toggleDrawer);
 
 document.getElementById('logoutBtn').addEventListener('click', () => window.location.href = 'index.html');
 
-// โหลดรายชื่อรุ่นรถทันทีเมื่อเปิดหน้า
-window.addEventListener('DOMContentLoaded', initCarDropdown);
+// เริ่มอ่านข้อมูลตารางทันทีเมื่อเปิดหน้า
+window.addEventListener('DOMContentLoaded', loadTableData);
 </script>
 </body>
 </html>
