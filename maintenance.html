@@ -185,65 +185,72 @@ select:focus { border-color: #e53e3e; }
     </div>
 
 <script>
-// ===== ใส่ Link ไฟล์ตาราง CSV หรือ Google Sheet (Export CSV) ตรงนี้ =====
 const DATA_SOURCE_URL = 'maintenance_data.csv'; 
 
 let parsedDatabase = {}; 
 
-// ===== ฟังก์ชั่นดึงและประมวลผลข้อมูลจากตาราง CSV =====
 async function loadTableData() {
     try {
         const response = await fetch(DATA_SOURCE_URL);
-        const rawText = await textCleaner(await response.text());
+        const rawText = await response.text();
         parseCSVToDataStructure(rawText);
         populateModelDropdown();
     } catch (err) {
         console.error("ไม่สามารถโหลดไฟล์ตารางได้:", err);
-        // หากโหลดไฟล์ไม่สำเร็จ ใช้ระบบสำรองในการดึงรายการรุ่นรถ
         displayArea.innerHTML = '<div class="empty-state">เกิดข้อผิดพลาดในการโหลดไฟล์ตารางข้อมูล กรุณาตรวจสอบไฟล์ maintenance_data.csv</div>';
     }
 }
 
-// ทำความสะอาดข้อความ ป้องกันการสับสนของวรรคหรือคอลัมน์
-function textCleaner(str) {
-    return str.replace(/\r/g, '');
-}
-
-// แปรรูปข้อมูล CSV เป็นโครงสร้าง { "ชื่อรุ่นรถ": { "รอบระยะ": [ รายการอะไหล่ ] } }
+// ===== ปรับปรุงตัวอ่าน CSV ใหม่ให้รองรับทุกรูปแบบตาราง =====
 function parseCSVToDataStructure(csvText) {
-    const lines = csvText.split('\n');
+    const lines = csvText.split(/\r?\n/);
     let currentModel = "";
     let currentMileage = "";
 
     lines.forEach(line => {
-        if (!line.trim()) return;
+        const trimmedLine = line.trim();
+        if (!trimmedLine) return;
 
-        // แยกคอลัมน์ด้วยเครื่องหมาย comma
-        const cols = line.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        // แยกคอลัมน์
+        const cols = trimmedLine.split(',').map(c => c.trim().replace(/^"|"$/g, ''));
+        const fullLineText = cols.join(' ');
 
-        // ดึงเฉพาะแถวที่เป็นการระบุ "รุ่นรถ" (กรองคำขยะออก)
-        if (cols[0] && (cols[0].includes("MG") || cols[0].includes("รุ่น")) && !cols[0].includes("ตารางแสดง") && !cols[0].includes("Part no")) {
-            currentModel = cols[0].replace("ตารางเช็กระยะ", "").replace("Periodical Maintenance Table", "").trim();
-            if (!parsedDatabase[currentModel]) {
-                parsedDatabase[currentModel] = {};
-            }
-        } 
-        // ตรวจจับรอบระยะทาง (เช่น 10,000 km, 20,000 km, 6 เดือน ฯลฯ)
-        else if (cols[0] && (cols[0].includes("กม.") || cols[0].includes("Km") || cols[0].includes("เดือน"))) {
-            currentMileage = cols[0];
-            if (currentModel && !parsedDatabase[currentModel][currentMileage]) {
-                parsedDatabase[currentModel][currentMileage] = [];
+        // 1. ตรวจจับรุ่นรถ: ดึงข้อความที่มีคำว่า MG (เช่น MG V80, MG ZS, MG HS)
+        const mgMatch = fullLineText.match(/MG\s+[A-Za-z0-9\s]+/i);
+        if (mgMatch && !fullLineText.includes("Part no") && !fullLineText.includes("เบอร์อะไหล่")) {
+            // ทำความสะอาดชื่อรุ่นรถ
+            let rawModel = mgMatch[0];
+            rawModel = rawModel.replace(/Periodical Maintenance Table|ตารางแสดงรายการอะไหล่|ตารางเช็กระยะ/gi, '').trim();
+            if (rawModel) {
+                currentModel = rawModel;
+                if (!parsedDatabase[currentModel]) {
+                    parsedDatabase[currentModel] = {};
+                }
             }
         }
-        // ตรวจจับรายการอะไหล่และรหัสสินค้า
-        else if (cols.length >= 2 && cols[0] && currentModel) {
+        
+        // 2. ตรวจจับรอบเช็กระยะ (เช่น 10,000 กม., Service Distance, 6 เดือน ฯลฯ)
+        if (fullLineText.includes("กม.") || fullLineText.includes("Km") || fullLineText.includes("เดือน") || fullLineText.includes("Distance")) {
+            const mileageText = cols[0] || cols[1] || "";
+            if (mileageText && !mileageText.includes("Part no") && !mileageText.includes("เบอร์อะไหล่")) {
+                currentMileage = mileageText;
+                if (currentModel && !parsedDatabase[currentModel][currentMileage]) {
+                    parsedDatabase[currentModel][currentMileage] = [];
+                }
+            }
+        }
+        // 3. ตรวจจับรายการอะไหล่ (มี รหัสสินค้า + ชื่ออะไหล่)
+        else if (cols.length >= 2 && currentModel) {
             const partNo = cols[0];
             const partName = cols[1];
             const price = cols[2] || "-";
 
-            // กรองคำหัวตารางออก
-            if (partNo !== "เบอร์อะไหล่" && partNo !== "Part no." && partName) {
-                // ถ้าระบุระยะไว้ ให้ลงกลุ่มระยะนั้น ถ้าไม่ได้ระบุ ให้ลงกลุ่มระยะล่าสุด
+            // กรองคำส่วนหัวตารางที่ไม่ใช่อะไหล่ออก
+            const isHeader = partNo.includes("เบอร์อะไหล่") || partNo.includes("Part no") || 
+                             partNo.includes("Service Distance") || partNo.includes("เดือนที่") ||
+                             partNo.includes("ตรวจเช็กที่ระยะ");
+
+            if (partNo && partName && !isHeader) {
                 const targetMileage = currentMileage || "รายการทั่วไป / ทุกระยะ";
                 if (!parsedDatabase[currentModel][targetMileage]) {
                     parsedDatabase[currentModel][targetMileage] = [];
@@ -259,7 +266,6 @@ function parseCSVToDataStructure(csvText) {
     });
 }
 
-// ===== เติมรายชื่อรุ่นรถที่คัดกรองแล้วลง Dropdown =====
 const carModelSelect = document.getElementById('carModelSelect');
 const mileageSelect = document.getElementById('mileageSelect');
 const displayArea = document.getElementById('displayArea');
@@ -281,7 +287,6 @@ function populateModelDropdown() {
     });
 }
 
-// เมื่อเปลี่ยนรุ่นรถ -> อัปเดตรอบระยะ
 carModelSelect.addEventListener('change', function() {
     const selectedModel = this.value;
     mileageSelect.innerHTML = '';
@@ -305,7 +310,6 @@ carModelSelect.addEventListener('change', function() {
     });
 });
 
-// เมื่อเปลี่ยนรอบระยะ -> แสดงตารางอะไหล่
 mileageSelect.addEventListener('change', function() {
     const model = carModelSelect.value;
     const mileage = this.value;
@@ -334,7 +338,6 @@ mileageSelect.addEventListener('change', function() {
     }
 });
 
-// ฟังก์ชั่นกด Copy
 let lastActiveRow = null;
 function copyText(text, element) {
     if (navigator.clipboard && window.isSecureContext) {
@@ -355,7 +358,6 @@ function copyText(text, element) {
     lastActiveRow = element;
 }
 
-// Nav Drawer
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -369,7 +371,6 @@ scrim.addEventListener('click', toggleDrawer);
 
 document.getElementById('logoutBtn').addEventListener('click', () => window.location.href = 'index.html');
 
-// เริ่มอ่านข้อมูลตารางทันทีเมื่อเปิดหน้า
 window.addEventListener('DOMContentLoaded', loadTableData);
 </script>
 </body>
