@@ -3,28 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมคำนวณค่าเช็กระยะ MG</title>
+    <title>โปรแกรมคำนวณค่าเช็กระยะ NEW MG ZS (เฉพาะค่าอะไหล่)</title>
 
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
     
-    /* ===== ตั้งค่าเริ่มต้นหน้าเว็บเต็มจอ ===== */
-    * {
-        box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
         font-family: 'Sarabun', Arial, sans-serif;
         margin: 0;
         min-height: 100vh;
-        display: flex;
-        flex-direction: column;
         background: #0d0d11 !important;
         color: #ffffff;
         font-size: 16px;
     }
 
-    /* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน ===== */
     #bg-video {
         position: fixed;
         inset: 0;
@@ -37,169 +31,32 @@
     .video-overlay {
         position: fixed;
         inset: 0;
-        background: rgba(0, 0, 0, 0.55);
+        background: rgba(0, 0, 0, 0.65);
         z-index: -1;
     }
 
-    /* ===== แถบด้านบน (Top Bar) ===== */
     .topbar {
         position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
+        top: 0; left: 0; right: 0;
         height: 70px;
-        background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2));
+        background: linear-gradient(90deg, rgba(217, 0, 0, 0.4), rgba(255, 45, 45, 0.25));
         border-bottom: 1px solid rgba(255, 255, 255, 0.15);
         display: flex;
         align-items: center;
         padding: 0 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(15px);
-        -webkit-backdrop-filter: blur(15px);
         z-index: 999;
     }
 
-    .hamburger-btn {
-        background: none;
-        border: none;
-        color: #fff;
-        font-size: 26px;
-        cursor: pointer;
-        margin-right: 15px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 5px;
-        transition: transform 0.2s ease;
-    }
+    .topbar h1 { color: #fff; margin: 0; font-size: 20px; font-weight: bold; }
+    .topbar span { color: rgba(255, 233, 233, 0.9); font-size: 13px; display: block; }
 
-    .hamburger-btn:hover {
-        transform: scale(1.1);
-    }
-
-    .topbar img {
-        width: 120px;
-        height: 50px;
-        object-fit: contain;
-        margin-right: 15px;
-        filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
-    }
-
-    .topbar h1 {
-        color: #fff;
-        margin: 0;
-        font-size: 20px;
-        font-weight: bold;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .topbar span {
-        color: rgba(255, 233, 233, 0.9);
-        font-size: 13px;
-        display: block;
-        text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* ===== ปุ่มออกจากระบบ ===== */
-    .btn-logout {
-        padding: 8px 16px;
-        background-color: #e53e3e;
-        color: white;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 6px;
-        font-family: 'Sarabun', sans-serif;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
-        position: fixed;
-        top: 16px;
-        right: 20px;
-        z-index: 1000;
-    }
-
-    .btn-logout:hover {
-        background-color: #c53030;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(229, 62, 62, 0.5);
-    }
-
-    /* ===== Hamburger Menu (Nav Drawer) ===== */
-    .scrim {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        z-index: 9998;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-    }
-
-    .scrim.active {
-        opacity: 1;
-        pointer-events: auto;
-    }
-
-    .nav-drawer {
-        position: fixed;
-        top: 0;
-        left: -300px;
-        width: 280px;
-        height: 100vh;
-        background: rgba(20, 20, 28, 0.85);
-        backdrop-filter: blur(25px);
-        -webkit-backdrop-filter: blur(25px);
-        border-right: 1px solid rgba(255, 255, 255, 0.15);
-        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
-        z-index: 9999;
-        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        display: flex;
-        flex-direction: column;
-        padding: 20px 0;
-    }
-
-    .nav-drawer.open {
-        left: 0;
-    }
-
-    .drawer-header {
-        padding: 0 20px 20px 20px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        color: #fff;
-        font-size: 18px;
-        font-weight: bold;
-    }
-
-    .drawer-menu {
-        list-style: none;
-        padding: 15px 0;
-        margin: 0;
-        flex: 1;
-    }
-
-    .drawer-menu li a {
-        display: flex;
-        align-items: center;
-        padding: 14px 25px;
-        color: rgba(255, 255, 255, 0.85);
-        text-decoration: none;
-        font-size: 16px;
-        transition: all 0.2s ease;
-    }
-
-    .drawer-menu li a:hover {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        padding-left: 30px;
-    }
-
-    /* ===== คอนเทนเนอร์หลักแบบกระจกใส ===== */
     .container {
         margin-top: 90px;
         margin-bottom: 40px;
         width: 92%;
-        max-width: 1000px;
+        max-width: 950px;
         margin-left: auto;
         margin-right: auto;
         padding: 30px;
@@ -207,13 +64,9 @@
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.08) !important;
         backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-        position: relative;
-        z-index: 1;
     }
 
-    /* ===== ฟอร์มและอินพุต ===== */
     .form-group {
         display: flex;
         gap: 20px;
@@ -221,17 +74,13 @@
         flex-wrap: wrap;
     }
 
-    .form-control {
-        flex: 1;
-        min-width: 240px;
-    }
+    .form-control { flex: 1; min-width: 240px; }
 
     label {
         display: block;
         font-weight: 600;
         margin-bottom: 8px;
         color: #ffffff;
-        text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     }
 
     select {
@@ -241,25 +90,15 @@
         border-radius: 10px;
         font-size: 15px;
         font-family: 'Sarabun', sans-serif;
-        background: rgba(0, 0, 0, 0.5);
+        background: rgba(0, 0, 0, 0.6);
         color: #ffffff;
         outline: none;
-        transition: all 0.3s ease;
     }
 
-    select:focus {
-        border-color: #ff4d4d;
-        box-shadow: 0 0 10px rgba(255, 77, 77, 0.5);
-    }
+    select option { background: #1a1a24; color: #fff; }
 
-    select option {
-        background: #1a1a24;
-        color: #fff;
-    }
-
-    /* ===== การ์ดโปร่งแสง ===== */
     .card {
-        background: rgba(0, 0, 0, 0.25) !important;
+        background: rgba(0, 0, 0, 0.3) !important;
         border: 1px solid rgba(255, 255, 255, 0.12);
         border-radius: 14px;
         padding: 20px;
@@ -270,48 +109,31 @@
         margin-top: 0;
         margin-bottom: 15px;
         color: #ffffff;
-        font-weight: 600;
         font-size: 18px;
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         padding-bottom: 10px;
     }
 
-    /* ===== ตารางสไตล์ Glassmorphism ===== */
-    .table-responsive {
-        overflow-x: auto;
-    }
+    .table-responsive { overflow-x: auto; }
 
     table {
         width: 100%;
         border-collapse: collapse;
         margin-top: 10px;
         background: rgba(255, 255, 255, 0.03);
-        border-radius: 8px;
-        overflow: hidden;
     }
 
     th, td {
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 12px 14px;
-        text-align: left;
         font-size: 14px;
         color: #e2e8f0;
     }
 
-    th {
-        background-color: rgba(255, 255, 255, 0.1);
-        color: #ffffff;
-        font-weight: 600;
-    }
-
-    tr:nth-child(even) {
-        background-color: rgba(255, 255, 255, 0.02);
-    }
-
+    th { background-color: rgba(255, 255, 255, 0.1); color: #ffffff; }
     .text-center { text-align: center; }
     .text-right { text-align: right; }
 
-    /* ===== สรุปยอดเงิน ===== */
     .total-box {
         background: rgba(0, 0, 0, 0.4);
         border: 1px solid rgba(255, 255, 255, 0.15);
@@ -337,119 +159,57 @@
         margin-bottom: 0;
     }
 
-    /* ===== Textarea & Copy Button ===== */
     textarea {
         width: 100%;
-        height: 130px;
+        height: 180px;
         margin-top: 10px;
         border-radius: 10px;
         border: 1px solid rgba(255, 255, 255, 0.2);
         padding: 12px;
         font-family: monospace;
         font-size: 13px;
-        background: rgba(0, 0, 0, 0.4);
+        background: rgba(0, 0, 0, 0.5);
         color: #38bdf8;
         outline: none;
-        resize: vertical;
     }
 
     .copy-btn {
         width: 100%;
         background: linear-gradient(135deg, #2563eb, #1d4ed8);
         color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        border: none;
         padding: 14px;
         font-size: 16px;
         font-family: 'Sarabun', sans-serif;
         font-weight: 600;
         border-radius: 10px;
         cursor: pointer;
-        transition: all 0.2s ease;
         margin-top: 15px;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        transition: background 0.3s ease;
     }
 
-    .copy-btn:hover {
-        background: linear-gradient(135deg, #1d4ed8, #1e40af);
-        transform: translateY(-2px);
-        box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6);
-    }
-
-    .copy-btn:active {
-        transform: translateY(0);
-    }
+    .copy-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
     </style>
 </head>
 <body>
 
-    <!-- ปุ่มออกจากระบบ -->
-    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
-
-    <!-- วิดีโอพื้นหลัง -->
-    <video id="bg-video" autoplay muted playsinline></video>
+    <video id="bg-video" autoplay muted loop playsinline src="https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"></video>
     <div class="video-overlay"></div>
 
-    <!-- Scrim (แผ่นเงาเมื่อสไลด์เปิดเมนู) -->
-    <div id="scrim" class="scrim"></div>
-
-    <!-- Hamburger Nav Drawer ด้านข้าง -->
-    <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
-        <div class="drawer-header">เมนูการใช้งาน</div>
-        <ul class="drawer-menu">
-            <li><a href="menu.html">🏠 กลับหน้าเลือกฟังก์ชั่น</a></li>
-            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
-            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
-        </ul>
-    </nav>
-
-    <!-- แถบ Topbar -->
     <div class="topbar">
-        <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
         <div>
-            <h1>คำนวณค่าเช็กระยะ MG</h1>
-            <span>Maintenance Calculator Tool</span>
+            <h1>โปรแกรมเช็กระยะ NEW MG ZS (คิดเฉพาะค่าอะไหล่)</h1>
+            <span>NEW MG ZS Maintenance Parts Calculator (Up to 300,000 km)</span>
         </div>
     </div>
 
-    <!-- คอนเทนเนอร์เนื้อหาหลัก -->
     <div class="container">
         
         <div class="form-group">
             <div class="form-control">
-                <label for="carModel">🚘 เลือกรุ่นรถยนต์ MG:</label>
-                <select id="carModel" onchange="calculateService()">
-                    <!-- รายชื่อรุ่นรถดึงตรงจากภาพถ่ายไฟล์ใน Google Drive ทั้งหมด 31 รุ่น -->
-                    <option value="NEW_MG_ZS_EV">NEW MG ZS EV</option>
+                <label for="carModel">🚘 เลือกรุ่นรถยนต์:</label>
+                <select id="carModel" disabled>
                     <option value="NEW_MG_ZS" selected>NEW MG ZS</option>
-                    <option value="NEW_MG_VS_HEV">NEW MG VS HEV</option>
-                    <option value="NEW_MG_S5_EV">NEW MG S5 EV</option>
-                    <option value="NEW_MG_IM6_IM5">NEW MG IM6-IM5</option>
-                    <option value="NEW_MG_HS_PHEV">NEW MG HS PHEV</option>
-                    <option value="NEW_MG_HS">NEW MG HS</option>
-                    <option value="NEW_MG_6">NEW MG 6</option>
-                    <option value="NEW_MG_5">NEW MG 5</option>
-                    <option value="MG_ZS_EV">MG ZS EV</option>
-                    <option value="MG_ZS">MG ZS</option>
-                    <option value="MG_V80">MG V80</option>
-                    <option value="MG_MAXUS_9">MG MAXUS 9</option>
-                    <option value="MG_MAXUS_7">MG MAXUS 7</option>
-                    <option value="MG_GS_2.0T">MG GS 2.0T</option>
-                    <option value="MG_GS_1.5T">MG GS 1.5T</option>
-                    <option value="MG_EXTENDER_4WD_AT">MG EXTENDER 4WD AT</option>
-                    <option value="MG_EXTENDER_2WD_MT">MG EXTENDER 2WD MT</option>
-                    <option value="MG_EXTENDER_2WD_AT">MG EXTENDER 2WD AT</option>
-                    <option value="MG_ES">MG ES</option>
-                    <option value="MG_EP">MG EP</option>
-                    <option value="MG_CYBERSTER">MG CYBERSTER</option>
-                    <option value="MG_6">MG 6</option>
-                    <option value="MG5_TURBO">MG5 TURBO</option>
-                    <option value="MG5_NON_TURBO">MG 5 NON TURBO</option>
-                    <option value="MG_4_EV_XPOWER">MG 4 EV XPOWER</option>
-                    <option value="MG_4_EV">MG 4 EV</option>
-                    <option value="MG_3_HYBRID_PLUS">MG 3 HYBRID+</option>
-                    <option value="MG_3">MG 3</option>
-                    <option value="ALL_NEW_MG_3">ALL NEW MG 3</option>
                 </select>
             </div>
             <div class="form-control">
@@ -468,7 +228,7 @@
                             <th>รายการอะไหล่</th>
                             <th class="text-center">จำนวน</th>
                             <th class="text-right">ราคา/หน่วย</th>
-                            <th class="text-right">ราคารวม</th>
+                            <th class="text-right">ราคารวม (บาท)</th>
                         </tr>
                     </thead>
                     <tbody></tbody>
@@ -476,251 +236,144 @@
             </div>
 
             <div class="total-box">
-                <div class="total-row"><span>รวมค่าอะไหล่:</span><span id="partsTotal">0.00 บาท</span></div>
-                <div class="total-row"><span>ค่าแรงบริการ:</span><span id="labourTotal">0.00 บาท</span></div>
+                <div class="total-row"><span>รวมราคาอะไหล่ก่อนภาษี:</span><span id="partsTotal">0.00 บาท</span></div>
                 <div class="total-row"><span>ภาษีมูลค่าเพิ่ม (VAT 7%):</span><span id="vatTotal">0.00 บาท</span></div>
-                <div class="total-row grand"><span>รวมสุทธิทั้งสิ้น:</span><span id="grandTotal">0.00 บาท</span></div>
+                <div class="total-row grand"><span>รวมราคาระบบสุทธิ (อะไหล่ + VAT):</span><span id="grandTotal">0.00 บาท</span></div>
             </div>
         </div>
 
         <div class="card">
-            <h3>📋 ข้อความสำหรับคัดลอก (Copy Text)</h3>
+            <h3>📋 ข้อความสำหรับคัดลอกส่งลูกค้า (Copy Text)</h3>
             <textarea id="copyText" readonly></textarea>
-            <button class="copy-btn" onclick="copyToClipboard()">📋 คัดลอกข้อความสรุป</button>
+            <button class="copy-btn" onclick="copyToClipboard()">📋 คัดลอกข้อความสรุปรายการอะไหล่</button>
         </div>
 
     </div>
 
 <script>
-// ===== JavaScript ควบคุม Hamburger Menu (Nav Drawer) =====
-const hamburgerBtn = document.getElementById('hamburgerBtn');
-const navDrawer = document.getElementById('navDrawer');
-const scrim = document.getElementById('scrim');
-
-function toggleDrawer() {
-    const isOpen = navDrawer.classList.contains('open');
-    if (isOpen) {
-        navDrawer.classList.remove('open');
-        scrim.classList.remove('active');
-        navDrawer.setAttribute('aria-expanded', 'false');
-    } else {
-        navDrawer.classList.add('open');
-        scrim.classList.add('active');
-        navDrawer.setAttribute('aria-expanded', 'true');
-    }
-}
-
-hamburgerBtn.addEventListener('click', toggleDrawer);
-scrim.addEventListener('click', toggleDrawer);
-
-// ===== ควบคุมวิดีโอพื้นหลัง =====
-const videoSources = [
-  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
-  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
-  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
-];
-
-let currentVideoIndex = 0;
-const videoPlayer = document.getElementById("bg-video");
-
-function playNextVideo() {
-  if (!videoPlayer || videoSources.length === 0) return;
-  
-  videoPlayer.src = videoSources[currentVideoIndex];
-  videoPlayer.load();
-  
-  videoPlayer.play().catch(err => {
-    console.log("วิดีโอโหลดไม่สำเร็จ กำลังข้ามไปตัวถัดไป...", err);
-    setTimeout(playNextVideo, 1000); 
-  });
-  
-  currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
-}
-
-if (videoPlayer) {
-  videoPlayer.addEventListener("ended", playNextVideo);
-  videoPlayer.addEventListener("error", playNextVideo);
-}
-
-window.addEventListener("DOMContentLoaded", playNextVideo);
-
-// ===== ปุ่ม Log out =====
-document.getElementById('logoutBtn').addEventListener('click', function() {
-    window.location.href = 'index.html';
-});
-
-// ===== ฐานข้อมูลอะไหล่กลาง =====
+// 1. ฐานข้อมูลอะไหล่ NEW MG ZS
 const partsDB = {
-    "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 (4L)", unit: 1, price: 1495 },
-    "11486328": { name: "ไส้กรองน้ำมันเครื่อง", unit: 1, price: 240 },
-    "ALU1403": { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", unit: 1, price: 12 },
-    "G00000362": { name: "ไส้กรองอากาศ", unit: 1, price: 355 },
-    "G00000266": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5", unit: 1, price: 590 },
-    "G00000356": { name: "ไส้กรองแอร์พรีเมี่ยม PM 2.5 (New EV)", unit: 1, price: 590 },
-    "10189906_EV": { name: "น้ำยาหม้อน้ำ 4 ลิตร (Coolant 4L)", unit: 2, price: 790 },
-    "10196876_EV": { name: "น้ำยาหม้อน้ำ 1 ลิตร (Coolant 1L)", unit: 2, price: 195 },
-    "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร (Coolant 4L)", unit: 1, price: 790 },
-    "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร (Coolant 1L)", unit: 1, price: 195 },
-    "G00000459": { name: "น้ำมันเบรก 1 ลิตร", unit: 1, price: 498 },
-    "10137065": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (ZS EV)", unit: 2, price: 1175 },
-    "10925167": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร (New ZS EV)", unit: 1, price: 1500 },
-    "10004211": { name: "แหวนรองเติมน้ำมันเกียร์", unit: 1, price: 3 },
-    "10064941": { name: "แหวนถ่ายน้ำมันเกียร์", unit: 1, price: 9 }
+    "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 4 ลิตร", price: 1495 },
+    "11486328": { name: "ไส้กรองน้ำมันเครื่อง", price: 240 },
+    "ALU1403":  { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", price: 12 },
+    "G00000362": { name: "ไส้กรองอากาศ", price: 355 },
+    "G00000266": { name: "ไส้กรองแอร์พรีเมียม PM 2.5", price: 590 },
+    "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร", price: 790 },
+    "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร", price: 195 },
+    "G00000459": { name: "น้ำมันเบรก 1 ลิตร", price: 498 },
+    "10471721": { name: "น้ำมันเกียร์อัตโนมัติ CVT 1 ลิตร", price: 425 },
+    "10407695": { name: "แหวนรองเติมน้ำมันเกียร์", price: 7 },
+    "10811222": { name: "แหวนถ่ายน้ำมันเกียร์", price: 9 },
+    "10501598": { name: "ปลั๊กอุดถ่ายน้ำมันเกียร์", price: 16 },
+    "10406912": { name: "ไส้กรองน้ำมันเกียร์", price: 350 },
+    "10406973": { name: "ไส้กรองเครื่องกรองแรงดันเกียร์", price: 170 },
+    "10412354": { name: "โอริงไส้กรองเครื่องกรองแรงดันเกียร์", price: 9 },
+    "11446616": { name: "หัวเทียน Spark plug", price: 165 },
+    "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter", price: 235 }
 };
 
-// ฟังก์ชั่นสำหรับสร้างโครงสร้างเงื่อนไขรถยนต์น้ำมัน / ไฮบริด
-const createStandardICE = () => ({
-    labourFreeKm: [10000, 20000, 30000, 40000, 50000],
-    labourRatePerHour: 750,
-    labourHours: { 10000:1.5, 20000:1.5, 30000:2.2, 40000:2.4, 50000:1.5, 60000:3.0, 70000:1.5, 80000:3.3, 90000:2.2, 100000:2.5, 110000:1.5, 120000:4.5, 130000:1.5, 140000:1.5, 150000:2.2, 160000:3.3, 170000:1.5, 180000:3.0, 190000:1.5, 200000:3.4, 210000:2.2, 220000:1.5, 230000:1.5, 240000:5.4, 250000:1.5, 260000:1.5, 270000:2.2, 280000:2.4, 290000:1.5, 300000:4.0 },
-    getParts: (km) => {
-        let list = ["10134155", "11486328", "ALU1403"];
-        if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("G00000362");
-        if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266");
-        if ([100000, 200000, 300000].includes(km)) list.push("10189906", "10196876");
-        if ([60000, 120000, 180000, 240000, 300000].includes(km)) list.push("G00000459");
-        return list;
+// 2. ฟังก์ชั่นคำนวณรอบลูปอะไหล่ลากยาวจนถึง 300,000 กม.
+function getPartsForKm(km) {
+    let list = [];
+    
+    // ทุกๆ 10,000 กม. เปลี่ยน 3 รายการพื้นฐาน
+    list.push({ code: "10134155", qty: 1 });
+    list.push({ code: "11486328", qty: 1 });
+    list.push({ code: "ALU1403", qty: 1 });
+
+    // ทุกๆ 30,000 กม. (30k, 60k, 90k, 120k, 150k, 180k, 210k, 240k, 270k, 300k)
+    if (km % 30000 === 0) {
+        list.push({ code: "G00000362", qty: 1 });
+        list.push({ code: "11446616", qty: 4 }); // หัวเทียน 4 หัว
     }
-});
 
-// ฟังก์ชั่นสำหรับสร้างโครงสร้างเงื่อนไขรถยนต์ไฟฟ้า EV
-const createStandardEV = () => ({
-    labourFreeKm: [10000, 20000, 30000, 40000, 50000],
-    labourRatePerHour: 750,
-    labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
-    getParts: (km) => {
-        let list = [];
-        if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000356", "G00000459");
-        if ([80000, 160000, 240000].includes(km)) list.push("10189906_EV", "10196876_EV", "10925167", "10004211", "10064941");
-        return list;
+    // ทุกๆ 40,000 กม. (40k, 80k, 120k, 160k, 200k, 240k, 280k)
+    if (km % 40000 === 0) {
+        list.push({ code: "G00000266", qty: 1 });
+        list.push({ code: "10137854", qty: 1 });
     }
-});
 
-// ===== โครงสร้างการคำนวณแยกตามรายชื่อรุ่นรถยนต์ทั้งหมด 31 รุ่น =====
-const masterData = {
-    schedules: {
-        // --- กลุ่มรถ EV ---
-        "NEW_MG_ZS_EV": createStandardEV(),
-        "NEW_MG_S5_EV": createStandardEV(),
-        "NEW_MG_IM6_IM5": createStandardEV(),
-        "MG_ZS_EV": {
-            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
-            labourRatePerHour: 750,
-            labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
-            getParts: (km) => {
-                let list = [];
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266", "G00000459");
-                if ([80000, 160000, 240000].includes(km)) list.push("10189906_EV", "10196876_EV", "10137065", "10004211", "10064941");
-                return list;
-            }
-        },
-        "MG_MAXUS_9": createStandardEV(),
-        "MG_MAXUS_7": createStandardEV(),
-        "MG_ES": createStandardEV(),
-        "MG_EP": createStandardEV(),
-        "MG_CYBERSTER": createStandardEV(),
-        "MG_4_EV_XPOWER": createStandardEV(),
-        "MG_4_EV": createStandardEV(),
-
-        // --- กลุ่มรถน้ำมัน / ไฮบริด ---
-        "NEW_MG_ZS": createStandardICE(),
-        "NEW_MG_VS_HEV": createStandardICE(),
-        "NEW_MG_HS_PHEV": createStandardICE(),
-        "NEW_MG_HS": createStandardICE(),
-        "NEW_MG_6": createStandardICE(),
-        "NEW_MG_5": createStandardICE(),
-        "MG_ZS": createStandardICE(),
-        "MG_V80": createStandardICE(),
-        "MG_GS_2.0T": createStandardICE(),
-        "MG_GS_1.5T": createStandardICE(),
-        "MG_EXTENDER_4WD_AT": createStandardICE(),
-        "MG_EXTENDER_2WD_MT": createStandardICE(),
-        "MG_EXTENDER_2WD_AT": createStandardICE(),
-        "MG_6": createStandardICE(),
-        "MG5_TURBO": createStandardICE(),
-        "MG5_NON_TURBO": createStandardICE(),
-        "MG_3_HYBRID_PLUS": createStandardICE(),
-        "MG_3": createStandardICE(),
-        "ALL_NEW_MG_3": createStandardICE()
+    // ทุกๆ 60,000 กม. (60k, 120k, 180k, 240k, 300k)
+    if (km % 60000 === 0) {
+        list.push({ code: "G00000459", qty: 1 });
     }
-};
 
-// เติม Dropdown กม.
+    // ทุกๆ 80,000 กม. (80k, 160k, 240k)
+    if (km % 80000 === 0) {
+        list.push({ code: "10471721", qty: 4 });
+        list.push({ code: "10407695", qty: 1 });
+        list.push({ code: "10811222", qty: 1 });
+        list.push({ code: "10501598", qty: 1 });
+        list.push({ code: "10406912", qty: 1 });
+        list.push({ code: "10406973", qty: 1 });
+        list.push({ code: "10412354", qty: 1 });
+    }
+
+    // ทุกๆ 100,000 กม. (100k, 200k, 300k)
+    if (km % 100000 === 0) {
+        list.push({ code: "10189906", qty: 1 });
+        list.push({ code: "10196876", qty: 1 });
+    }
+
+    return list;
+}
+
+// 3. วนลูปสร้างตัวเลือก Dropdown กม. ตั้งแต่ 10,000 ถึง 300,000 กม.
 const kmSelect = document.getElementById('serviceKm');
 for (let km = 10000; km <= 300000; km += 10000) {
     let opt = document.createElement('option');
     opt.value = km;
     opt.textContent = `${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)`;
-    if(km === 80000) opt.selected = true;
+    if(km === 80000) opt.selected = true; 
     kmSelect.appendChild(opt);
 }
 
+// 4. ฟังก์ชั่นคำนวณยอดเงินอะไหล่
 function calculateService() {
-    const modelKey = document.getElementById('carModel').value;
     const km = parseInt(document.getElementById('serviceKm').value);
-    
-    // ดึงข้อมูลรุ่นรถ
-    const modelData = masterData.schedules[modelKey] || createStandardICE();
-    
-    const partKeys = modelData.getParts(km);
+    const requiredParts = getPartsForKm(km);
     const tbody = document.querySelector('#partsTable tbody');
     tbody.innerHTML = '';
     
     let partsTotal = 0;
     let summaryTextParts = [];
 
-    if (partKeys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#aaa;">ไม่มีรายการเปลี่ยนอะไหล่ในรอบนี้ (ตรวจเช็กตามระยะฟรี/ปกติ)</td></tr>`;
-    } else {
-        partKeys.forEach((key, idx) => {
-            const item = partsDB[key] || { name: "อะไหล่ตามระยะ", unit: 1, price: 0 };
-            const cleanKey = key.replace('_EV', '');
-            const itemTotal = item.price * item.unit;
-            partsTotal += itemTotal;
+    requiredParts.forEach((item, idx) => {
+        const partInfo = partsDB[item.code];
+        const qty = item.qty;
+        const itemTotal = partInfo.price * qty;
+        partsTotal += itemTotal;
 
-            tbody.innerHTML += `
-                <tr>
-                    <td>${cleanKey}</td>
-                    <td>${item.name}</td>
-                    <td class="text-center">${item.unit}</td>
-                    <td class="text-right">${item.price.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                    <td class="text-right">${itemTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
-                </tr>
-            `;
-            summaryTextParts.push(`${idx + 1}. ${item.name} x${item.unit} = ${itemTotal.toLocaleString()} บาท`);
-        });
-    }
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.code}</td>
+                <td>${partInfo.name}</td>
+                <td class="text-center">${qty}</td>
+                <td class="text-right">${partInfo.price.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+                <td class="text-right">${itemTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})}</td>
+            </tr>
+        `;
+        summaryTextParts.push(`${idx + 1}. ${partInfo.name} x${qty} = ${itemTotal.toLocaleString()} บาท`);
+    });
 
-    // คำนวณค่าแรง
-    const hours = modelData.labourHours[km] || 1.5;
-    const isFree = modelData.labourFreeKm.includes(km);
-    const labourCost = isFree ? 0 : (hours * modelData.labourRatePerHour);
+    // คำนวณ VAT 7% ของอะไหล่
+    const vat = partsTotal * 0.07;
+    const grandTotal = partsTotal + vat;
 
-    // ภาษีและราคารวม
-    const subtotal = partsTotal + labourCost;
-    const vat = subtotal * 0.07;
-    const grandTotal = subtotal + vat;
-
-    // แสดงผล
+    // แสดงผลข้อมูลลงในหน้าจอ
     document.getElementById('partsTotal').innerText = `${partsTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
-    document.getElementById('labourTotal').innerText = isFree ? `ฟรี (${hours} ชม.)` : `${labourCost.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท (${hours} ชม.)`;
     document.getElementById('vatTotal').innerText = `${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
     document.getElementById('grandTotal').innerText = `${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
 
-    // สรุป Text
-    const modelName = document.getElementById('carModel').options[document.getElementById('carModel').selectedIndex].text;
-    let copyStr = `รายการเช็กระยะ ${modelName} - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
+    // สรุป Text สำหรับ Copy
+    let copyStr = `รายการอะไหล่เช็กระยะ NEW MG ZS - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
     copyStr += `----------------------------------------\n`;
-    if (summaryTextParts.length > 0) {
-        copyStr += summaryTextParts.join('\n') + `\n`;
-    } else {
-        copyStr += `ไม่มีรายการเปลี่ยนอะไหล่ (ตรวจเช็กระยะอย่างเดียว)\n`;
-    }
+    copyStr += summaryTextParts.join('\n') + `\n`;
     copyStr += `----------------------------------------\n`;
     copyStr += `รวมค่าอะไหล่: ${partsTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท\n`;
-    copyStr += `ค่าแรงบริการ: ${isFree ? 'ฟรี' : labourCost.toLocaleString('th-TH', {minimumFractionDigits: 2}) + ' บาท'}\n`;
     copyStr += `ภาษีมูลค่าเพิ่ม (7%): ${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท\n`;
-    copyStr += `ยอดรวมสุทธิ: ${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
+    copyStr += `ยอดรวมค่าอะไหล่สุทธิ: ${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท\n`;
+    copyStr += `(หมายเหตุ: ราคายังไม่รวมค่าบริการแรงงานช่าง)`;
 
     document.getElementById('copyText').value = copyStr;
 }
@@ -729,10 +382,10 @@ function copyToClipboard() {
     const copyText = document.getElementById("copyText");
     copyText.select();
     document.execCommand("copy");
-    alert("คัดลอกข้อความสรุปเรียบร้อยแล้ว!");
+    alert("คัดลอกข้อความสรุปรายการอะไหล่เรียบร้อยแล้ว!");
 }
 
-// คำนวณเมื่อโหลดหน้าเว็บ
+// ประมวลผลครั้งแรกทันทีที่เปิดหน้า
 calculateService();
 </script>
 
