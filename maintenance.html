@@ -1,235 +1,406 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>โปรแกรมคำนวณค่าเช็กระยะ NEW MG ZS (เฉพาะค่าอะไหล่)</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>อะไหล่เช็กระยะ - Maintenance Calculator</title>
 
-    <style>
-    @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
-    
-    * { box-sizing: border-box; }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
+  
+* {
+  box-sizing: border-box;
+}
 
-    body {
-        font-family: 'Sarabun', Arial, sans-serif;
-        margin: 0;
-        min-height: 100vh;
-        background: #0d0d11 !important;
-        color: #ffffff;
-        font-size: 16px;
-    }
+body {
+  font-family: 'Sarabun', Arial, sans-serif;
+  margin: 0;
+  min-height: 100vh;
+  background: #0d0d11 !important;
+  color: #ffffff;
+  font-size: 16px;
+}
 
-    #bg-video {
-        position: fixed;
-        inset: 0;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        z-index: -2;
-    }
+/* ===== วิดีโอพื้นหลังและแผ่นฟิล์มซ้อน ===== */
+#bg-video {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
 
-    .video-overlay {
-        position: fixed;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.65);
-        z-index: -1;
-    }
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: -1;
+}
 
-    /* แถบด้านบน Topbar */
-    .topbar {
-        position: fixed;
-        top: 0; left: 0; right: 0;
-        height: 70px;
-        background: linear-gradient(90deg, rgba(217, 0, 0, 0.6), rgba(180, 0, 0, 0.4));
-        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        padding: 0 25px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-        backdrop-filter: blur(15px);
-        z-index: 999;
-    }
+/* ===== แถบด้านบน (Top Bar) แบบเดียวกับหน้าหลัก ===== */
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: linear-gradient(90deg, rgba(217, 0, 0, 0.3), rgba(255, 45, 45, 0.2));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  z-index: 999;
+}
 
-    .topbar-brand h1 { color: #fff; margin: 0; font-size: 18px; font-weight: bold; }
-    .topbar-brand span { color: rgba(255, 233, 233, 0.85); font-size: 12px; display: block; }
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
 
-    /* แถบฟังก์ชั่นเลือกข้อมูลด้านบน (Filter Header) */
-    .filter-bar {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
+.hamburger-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 26px;
+  cursor: pointer;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
 
-    .filter-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
+.hamburger-btn:hover {
+  transform: scale(1.1);
+}
 
-    .filter-item label {
-        font-size: 14px;
-        font-weight: 500;
-        color: #f1f5f9;
-        white-space: nowrap;
-    }
+.topbar img {
+  width: 120px;
+  height: 50px;
+  object-fit: contain;
+  margin-right: 15px;
+  filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.3));
+}
 
-    .filter-item select {
-        padding: 8px 12px;
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        font-size: 14px;
-        font-family: 'Sarabun', sans-serif;
-        background: rgba(0, 0, 0, 0.7);
-        color: #ffffff;
-        outline: none;
-        cursor: pointer;
-    }
+.topbar-title h1 {
+  color: #fff;
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
 
-    .filter-item select option { background: #1a1a24; color: #fff; }
+.topbar-title span {
+  color: rgba(255, 233, 233, 0.9);
+  font-size: 13px;
+  display: block;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
 
-    .container {
-        margin-top: 100px;
-        margin-bottom: 40px;
-        width: 92%;
-        max-width: 1000px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 30px;
-        border: 2px solid rgba(255, 255, 255, 0.15);
-        border-radius: 20px;
-        background: rgba(255, 255, 255, 0.08) !important;
-        backdrop-filter: blur(20px);
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-    }
+/* ===== เพิ่มส่วน Filter Select ใน Topbar ===== */
+.topbar-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+  margin-right: 120px; /* เว้นระยะให้ปุ่ม Logout */
+}
 
-    .card {
-        background: rgba(0, 0, 0, 0.3) !important;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 14px;
-        padding: 20px;
-        margin-bottom: 25px;
-    }
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
-    .card h3 {
-        margin-top: 0;
-        margin-bottom: 15px;
-        color: #ffffff;
-        font-size: 18px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        padding-bottom: 10px;
-    }
+.filter-group label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f1f5f9;
+  white-space: nowrap;
+}
 
-    .table-responsive { overflow-x: auto; }
+.filter-group select {
+  padding: 6px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'Sarabun', sans-serif;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 10px;
-        background: rgba(255, 255, 255, 0.03);
-    }
+.filter-group select option {
+  background: #1a1a24;
+  color: #fff;
+}
 
-    th, td {
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 12px 14px;
-        font-size: 14px;
-        color: #e2e8f0;
-    }
+/* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
+.btn-logout {
+  padding: 8px 16px;
+  background-color: #e53e3e;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(229, 62, 62, 0.3);
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 1000;
+}
 
-    th { background-color: rgba(255, 255, 255, 0.15); color: #ffffff; }
-    .text-center { text-align: center; }
-    .text-right { text-align: right; }
+.btn-logout:hover {
+  background-color: #c53030;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(229, 62, 62, 0.5);
+}
 
-    .total-box {
-        background: rgba(0, 0, 0, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        border-radius: 10px;
-        padding: 18px;
-        margin-top: 20px;
-    }
+/* ===== Hamburger Menu (Nav Drawer) ===== */
+.scrim {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
 
-    .total-row {
-        display: flex;
-        justify-content: space-between;
-        font-size: 15px;
-        margin-bottom: 10px;
-        color: #cbd5e1;
-    }
+.scrim.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
-    .total-row.grand {
-        font-size: 20px;
-        font-weight: bold;
-        color: #4ade80;
-        border-top: 1px solid rgba(255, 255, 255, 0.15);
-        padding-top: 12px;
-        margin-bottom: 0;
-    }
+.nav-drawer {
+  position: fixed;
+  top: 0;
+  left: -300px;
+  width: 280px;
+  height: 100vh;
+  background: rgba(20, 20, 28, 0.85);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+  z-index: 9999;
+  transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0;
+}
 
-    textarea {
-        width: 100%;
-        height: 180px;
-        margin-top: 10px;
-        border-radius: 10px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 12px;
-        font-family: monospace;
-        font-size: 13px;
-        background: rgba(0, 0, 0, 0.5);
-        color: #38bdf8;
-        outline: none;
-    }
+.nav-drawer.open {
+  left: 0;
+}
 
-    .copy-btn {
-        width: 100%;
-        background: linear-gradient(135deg, #2563eb, #1d4ed8);
-        color: #fff;
-        border: none;
-        padding: 14px;
-        font-size: 16px;
-        font-family: 'Sarabun', sans-serif;
-        font-weight: 600;
-        border-radius: 10px;
-        cursor: pointer;
-        margin-top: 15px;
-        transition: background 0.3s ease;
-    }
+.drawer-header {
+  padding: 0 20px 20px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 18px;
+  font-weight: bold;
+}
 
-    .copy-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
+.drawer-menu {
+  list-style: none;
+  padding: 15px 0;
+  margin: 0;
+  flex: 1;
+}
 
-    @media (max-width: 768px) {
-        .topbar { flex-direction: column; height: auto; padding: 15px; gap: 10px; }
-        .container { margin-top: 140px; }
-        .filter-bar { width: 100%; flex-direction: column; align-items: stretch; }
-        .filter-item { justify-content: space-between; }
-    }
-    </style>
+.drawer-menu li a {
+  display: flex;
+  align-items: center;
+  padding: 14px 25px;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.drawer-menu li a:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding-left: 30px;
+}
+
+/* ===== คอนเทนเนอร์เนื้อหา ===== */
+.container {
+  margin-top: 90px;
+  margin-bottom: 40px;
+  width: 92%;
+  max-width: 1100px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 25px;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.card {
+  background: rgba(0, 0, 0, 0.35) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #ffffff;
+  font-size: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 10px;
+}
+
+.table-responsive { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+th, td {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #e2e8f0;
+}
+
+th { background-color: rgba(255, 255, 255, 0.12); color: #ffffff; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+
+.total-box {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 15px;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #cbd5e1;
+}
+
+.total-row.grand {
+  font-size: 18px;
+  font-weight: bold;
+  color: #4ade80;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  padding-top: 10px;
+  margin-bottom: 0;
+}
+
+textarea {
+  width: 100%;
+  height: 160px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 12px;
+  font-family: monospace;
+  font-size: 13px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #38bdf8;
+  outline: none;
+}
+
+.copy-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  border: none;
+  padding: 12px;
+  font-size: 15px;
+  font-family: 'Sarabun', sans-serif;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 12px;
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
+
+@media (max-width: 900px) {
+  .topbar { flex-wrap: wrap; height: auto; padding: 10px 15px; }
+  .topbar-filters { margin-left: 0; margin-right: 0; width: 100%; margin-top: 8px; justify-content: space-between; }
+  .container { margin-top: 130px; }
+}
+</style>
 </head>
 <body>
 
-    <video id="bg-video" autoplay muted loop playsinline src="https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"></video>
+    <!-- ปุ่มออกจากระบบ -->
+    <button id="logoutBtn" class="btn-logout">ออกจากระบบ</button>
+
+    <!-- วิดีโอพื้นหลัง -->
+    <video id="bg-video" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
 
-    <!-- แถบด้านบนพร้อมฟังก์ชั่นเลือกข้อมูล -->
+    <!-- Scrim (แผ่นเงาเมื่อสไลด์เปิดเมนู) -->
+    <div id="scrim" class="scrim"></div>
+
+    <!-- Hamburger Nav Drawer ด้านข้าง -->
+    <nav id="navDrawer" class="nav-drawer" aria-expanded="false">
+        <div class="drawer-header">เมนูการใช้งาน</div>
+        <ul class="drawer-menu">
+            <li><a href="menu.html">🏠 กลับหน้าเลือกฟังก์ชั่น</a></li>
+            <li><a href="main.html">🚗 อุปกรณ์ตกแต่ง</a></li>
+            <li><a href="maintenance.html">🔧 อะไหล่เช็กระยะ</a></li>
+        </ul>
+    </nav>
+
+    <!-- แถบ Topbar สไตล์หลัก + เพิ่ม Filter Select -->
     <div class="topbar">
-        <div class="topbar-brand">
-            <h1>ระบบคำนวณราคาเช็กระยะ (เฉพาะอะไหล่)</h1>
-            <span>NEW MG ZS Maintenance Parts Calculator ( Up to 300,000 km )</span>
+        <div class="topbar-left">
+            <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQGTnPqfhHyFNfp_04YV8a0w1bqfrAM4jJRw3NIh0O7ag&s=10" alt="Logo">
+            <div class="topbar-title">
+                <h1>รายการอะไหล่เช็กระยะ</h1>
+                <span>Maintenance Calculator Tool</span>
+            </div>
         </div>
-        
-        <div class="filter-bar">
-            <div class="filter-item">
-                <label for="carModel">🚘 เลือกรุ่น:</label>
+
+        <!-- แถบตัวเลือกข้อมูล (เลือกรุ่น / ระยะทาง) -->
+        <div class="topbar-filters">
+            <div class="filter-group">
+                <label for="carModel">🚘 รุ่น:</label>
                 <select id="carModel" disabled>
                     <option value="NEW_MG_ZS" selected>NEW MG ZS</option>
                 </select>
             </div>
-            <div class="filter-item">
+            <div class="filter-group">
                 <label for="serviceKm">📍 ระยะทาง:</label>
                 <select id="serviceKm" onchange="calculateService()"></select>
             </div>
         </div>
     </div>
 
+    <!-- คอนเทนเนอร์เนื้อหาหลัก -->
     <div class="container">
 
         <div class="card">
@@ -265,7 +436,59 @@
     </div>
 
 <script>
-// 1. ฐานข้อมูลรายการอะไหล่ NEW MG ZS
+// ===== JavaScript ควบคุม Hamburger Menu (Nav Drawer) =====
+const hamburgerBtn = document.getElementById('hamburgerBtn');
+const navDrawer = document.getElementById('navDrawer');
+const scrim = document.getElementById('scrim');
+
+function toggleDrawer() {
+    const isOpen = navDrawer.classList.contains('open');
+    if (isOpen) {
+        navDrawer.classList.remove('open');
+        scrim.classList.remove('active');
+        navDrawer.setAttribute('aria-expanded', 'false');
+    } else {
+        navDrawer.classList.add('open');
+        scrim.classList.add('active');
+        navDrawer.setAttribute('aria-expanded', 'true');
+    }
+}
+
+hamburgerBtn.addEventListener('click', toggleDrawer);
+scrim.addEventListener('click', toggleDrawer);
+
+// ===== ควบคุมวิดีโอพื้นหลัง =====
+const videoSources = [
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/14a0f413e3b14d25aa5ab0367db0cc5b.mp4",
+  "https://mg-upload.sgp1.cdn.digitaloceanspaces.com/f9c82dbc18f0b22b4170de8ce12b1ebf.mp4",
+  "https://www.mgcars.com/static/car-banner/mgcyberster/hero-banner.mp4"
+];
+
+let currentVideoIndex = 0;
+const videoPlayer = document.getElementById("bg-video");
+
+function playNextVideo() {
+  if (!videoPlayer || videoSources.length === 0) return;
+  
+  videoPlayer.src = videoSources[currentVideoIndex];
+  videoPlayer.load();
+  
+  videoPlayer.play().catch(err => {
+    console.log("วิดีโอโหลดไม่สำเร็จ กำลังข้ามไปตัวถัดไป...", err);
+    setTimeout(playNextVideo, 1000); 
+  });
+  
+  currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
+}
+
+if (videoPlayer) {
+  videoPlayer.addEventListener("ended", playNextVideo);
+  videoPlayer.addEventListener("error", playNextVideo);
+}
+
+window.addEventListener("DOMContentLoaded", playNextVideo);
+
+// ===== ระบบคำนวณอะไหล่เช็กระยะ =====
 const partsDB = {
     "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 4 ลิตร", price: 1495 },
     "11486328": { name: "ไส้กรองน้ำมันเครื่อง", price: 240 },
@@ -286,33 +509,24 @@ const partsDB = {
     "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter", price: 235 }
 };
 
-// 2. ฟังก์ชั่นดึงอะไหล่ตามระยะทาง (วนลูปตามเงื่อนไขจนถึง 300,000 กม.)
 function getPartsForKm(km) {
-    let list = [];
-    
-    // ทุกๆ 10,000 กม. เปลี่ยนน้ำมันเครื่อง + กรองเครื่อง + แหวน
-    list.push({ code: "10134155", qty: 1 });
-    list.push({ code: "11486328", qty: 1 });
-    list.push({ code: "ALU1403", qty: 1 });
+    let list = [
+        { code: "10134155", qty: 1 },
+        { code: "11486328", qty: 1 },
+        { code: "ALU1403", qty: 1 }
+    ];
 
-    // ทุกๆ 30,000 กม.
     if (km % 30000 === 0) {
         list.push({ code: "G00000362", qty: 1 });
         list.push({ code: "11446616", qty: 4 });
     }
-
-    // ทุกๆ 40,000 กม.
     if (km % 40000 === 0) {
         list.push({ code: "G00000266", qty: 1 });
         list.push({ code: "10137854", qty: 1 });
     }
-
-    // ทุกๆ 60,000 กม.
     if (km % 60000 === 0) {
         list.push({ code: "G00000459", qty: 1 });
     }
-
-    // ทุกๆ 80,000 กม.
     if (km % 80000 === 0) {
         list.push({ code: "10471721", qty: 4 });
         list.push({ code: "10407695", qty: 1 });
@@ -322,27 +536,23 @@ function getPartsForKm(km) {
         list.push({ code: "10406973", qty: 1 });
         list.push({ code: "10412354", qty: 1 });
     }
-
-    // ทุกๆ 100,000 กม.
     if (km % 100000 === 0) {
         list.push({ code: "10189906", qty: 1 });
         list.push({ code: "10196876", qty: 1 });
     }
-
     return list;
 }
 
-// 3. เติมตัวเลือก Dropdown กม. บนแถบฟังก์ชั่นด้านบน (10,000 - 300,000 กม.)
+// เติม Option ระยะทาง (10,000 - 300,000 กม.)
 const kmSelect = document.getElementById('serviceKm');
 for (let km = 10000; km <= 300000; km += 10000) {
     let opt = document.createElement('option');
     opt.value = km;
     opt.textContent = `${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)`;
-    if(km === 80000) opt.selected = true; // ตั้งต้นไว้ที่ 80,000 กม.
+    if(km === 80000) opt.selected = true;
     kmSelect.appendChild(opt);
 }
 
-// 4. คำนวณสรุปผล
 function calculateService() {
     const km = parseInt(document.getElementById('serviceKm').value);
     const requiredParts = getPartsForKm(km);
@@ -395,6 +605,10 @@ function copyToClipboard() {
     document.execCommand("copy");
     alert("คัดลอกข้อความสรุปรายการอะไหล่เรียบร้อยแล้ว!");
 }
+
+document.getElementById('logoutBtn').addEventListener('click', function() {
+    window.location.href = 'index.html';
+});
 
 calculateService();
 </script>
