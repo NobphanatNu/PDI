@@ -417,11 +417,39 @@
         
         <div class="form-group">
             <div class="form-control">
-                <label for="carModel">🚘 เลือกรุ่นรถ:</label>
+                <label for="carModel">🚘 เลือกรุ่นรถยนต์ MG:</label>
                 <select id="carModel" onchange="calculateService()">
-                    <option value="NEW_MG_ZS">New MG ZS</option>
-                    <option value="MG_ZS_EV" selected>MG ZS EV</option>
-                    <option value="NEW_MG_ZS_EV">New MG ZS EV</option>
+                    <!-- รายชื่อรุ่นรถดึงตรงจากภาพถ่ายไฟล์ใน Google Drive ทั้งหมด 31 รุ่น -->
+                    <option value="NEW_MG_ZS_EV">NEW MG ZS EV</option>
+                    <option value="NEW_MG_ZS" selected>NEW MG ZS</option>
+                    <option value="NEW_MG_VS_HEV">NEW MG VS HEV</option>
+                    <option value="NEW_MG_S5_EV">NEW MG S5 EV</option>
+                    <option value="NEW_MG_IM6_IM5">NEW MG IM6-IM5</option>
+                    <option value="NEW_MG_HS_PHEV">NEW MG HS PHEV</option>
+                    <option value="NEW_MG_HS">NEW MG HS</option>
+                    <option value="NEW_MG_6">NEW MG 6</option>
+                    <option value="NEW_MG_5">NEW MG 5</option>
+                    <option value="MG_ZS_EV">MG ZS EV</option>
+                    <option value="MG_ZS">MG ZS</option>
+                    <option value="MG_V80">MG V80</option>
+                    <option value="MG_MAXUS_9">MG MAXUS 9</option>
+                    <option value="MG_MAXUS_7">MG MAXUS 7</option>
+                    <option value="MG_GS_2.0T">MG GS 2.0T</option>
+                    <option value="MG_GS_1.5T">MG GS 1.5T</option>
+                    <option value="MG_EXTENDER_4WD_AT">MG EXTENDER 4WD AT</option>
+                    <option value="MG_EXTENDER_2WD_MT">MG EXTENDER 2WD MT</option>
+                    <option value="MG_EXTENDER_2WD_AT">MG EXTENDER 2WD AT</option>
+                    <option value="MG_ES">MG ES</option>
+                    <option value="MG_EP">MG EP</option>
+                    <option value="MG_CYBERSTER">MG CYBERSTER</option>
+                    <option value="MG_6">MG 6</option>
+                    <option value="MG5_TURBO">MG5 TURBO</option>
+                    <option value="MG5_NON_TURBO">MG 5 NON TURBO</option>
+                    <option value="MG_4_EV_XPOWER">MG 4 EV XPOWER</option>
+                    <option value="MG_4_EV">MG 4 EV</option>
+                    <option value="MG_3_HYBRID_PLUS">MG 3 HYBRID+</option>
+                    <option value="MG_3">MG 3</option>
+                    <option value="ALL_NEW_MG_3">ALL NEW MG 3</option>
                 </select>
             </div>
             <div class="form-control">
@@ -521,7 +549,7 @@ document.getElementById('logoutBtn').addEventListener('click', function() {
     window.location.href = 'index.html';
 });
 
-// ===== ระบบคำนวณค่าเช็กระยะ =====
+// ===== ฐานข้อมูลอะไหล่กลาง =====
 const partsDB = {
     "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 (4L)", unit: 1, price: 1495 },
     "11486328": { name: "ไส้กรองน้ำมันเครื่อง", unit: 1, price: 240 },
@@ -540,51 +568,80 @@ const partsDB = {
     "10064941": { name: "แหวนถ่ายน้ำมันเกียร์", unit: 1, price: 9 }
 };
 
+// ฟังก์ชั่นสำหรับสร้างโครงสร้างเงื่อนไขรถยนต์น้ำมัน / ไฮบริด
+const createStandardICE = () => ({
+    labourFreeKm: [10000, 20000, 30000, 40000, 50000],
+    labourRatePerHour: 750,
+    labourHours: { 10000:1.5, 20000:1.5, 30000:2.2, 40000:2.4, 50000:1.5, 60000:3.0, 70000:1.5, 80000:3.3, 90000:2.2, 100000:2.5, 110000:1.5, 120000:4.5, 130000:1.5, 140000:1.5, 150000:2.2, 160000:3.3, 170000:1.5, 180000:3.0, 190000:1.5, 200000:3.4, 210000:2.2, 220000:1.5, 230000:1.5, 240000:5.4, 250000:1.5, 260000:1.5, 270000:2.2, 280000:2.4, 290000:1.5, 300000:4.0 },
+    getParts: (km) => {
+        let list = ["10134155", "11486328", "ALU1403"];
+        if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("G00000362");
+        if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266");
+        if ([100000, 200000, 300000].includes(km)) list.push("10189906", "10196876");
+        if ([60000, 120000, 180000, 240000, 300000].includes(km)) list.push("G00000459");
+        return list;
+    }
+});
+
+// ฟังก์ชั่นสำหรับสร้างโครงสร้างเงื่อนไขรถยนต์ไฟฟ้า EV
+const createStandardEV = () => ({
+    labourFreeKm: [10000, 20000, 30000, 40000, 50000],
+    labourRatePerHour: 750,
+    labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
+    getParts: (km) => {
+        let list = [];
+        if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000356", "G00000459");
+        if ([80000, 160000, 240000].includes(km)) list.push("10189906_EV", "10196876_EV", "10925167", "10004211", "10064941");
+        return list;
+    }
+});
+
+// ===== โครงสร้างการคำนวณแยกตามรายชื่อรุ่นรถยนต์ทั้งหมด 31 รุ่น =====
 const masterData = {
     schedules: {
-        "NEW_MG_ZS": {
-            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
-            labourRatePerHour: 750,
-            labourHours: { 10000:1.5, 20000:1.5, 30000:2.2, 40000:2.4, 50000:1.5, 60000:3.0, 70000:1.5, 80000:3.3, 90000:2.2, 100000:2.5, 110000:1.5, 120000:4.5, 130000:1.5, 140000:1.5, 150000:2.2, 160000:3.3, 170000:1.5, 180000:3.0, 190000:1.5, 200000:3.4, 210000:2.2, 220000:1.5, 230000:1.5, 240000:5.4, 250000:1.5, 260000:1.5, 270000:2.2, 280000:2.4, 290000:1.5, 300000:4.0 },
-            getParts: (km) => {
-                let list = ["10134155", "11486328", "ALU1403"];
-                if ([30000, 60000, 90000, 120000, 150000, 180000, 210000, 240000, 270000, 300000].includes(km)) list.push("G00000362");
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266");
-                if ([100000, 200000, 300000].includes(km)) list.push("10189906", "10196876");
-                if ([60000, 120000, 180000, 240000, 300000].includes(km)) list.push("G00000459");
-                return list;
-            }
-        },
+        // --- กลุ่มรถ EV ---
+        "NEW_MG_ZS_EV": createStandardEV(),
+        "NEW_MG_S5_EV": createStandardEV(),
+        "NEW_MG_IM6_IM5": createStandardEV(),
         "MG_ZS_EV": {
             labourFreeKm: [10000, 20000, 30000, 40000, 50000],
             labourRatePerHour: 750,
             labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
             getParts: (km) => {
                 let list = [];
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) {
-                    list.push("G00000266", "G00000459");
-                }
-                if ([80000, 160000, 240000].includes(km)) {
-                    list.push("10189906_EV", "10196876_EV", "10137065", "10004211", "10064941");
-                }
+                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) list.push("G00000266", "G00000459");
+                if ([80000, 160000, 240000].includes(km)) list.push("10189906_EV", "10196876_EV", "10137065", "10004211", "10064941");
                 return list;
             }
         },
-        "NEW_MG_ZS_EV": {
-            labourFreeKm: [10000, 20000, 30000, 40000, 50000],
-            labourRatePerHour: 750,
-            labourHours: { 10000:0.5, 20000:0.5, 30000:0.5, 40000:1.0, 50000:0.5, 60000:0.5, 70000:0.5, 80000:1.8, 90000:0.5, 100000:0.5, 110000:0.5, 120000:1.0, 130000:0.5, 140000:0.5, 150000:0.5, 160000:1.8, 170000:0.5, 180000:0.5, 190000:0.5, 200000:1.0, 210000:0.5, 220000:0.5, 230000:0.5, 240000:1.8, 250000:0.5, 260000:0.5, 270000:0.5, 280000:1.0, 290000:0.5, 300000:0.5 },
-            getParts: (km) => {
-                let list = [];
-                if ([40000, 80000, 120000, 160000, 200000, 240000, 280000].includes(km)) {
-                    list.push("G00000356", "G00000459");
-                }
-                if ([80000, 160000, 240000].includes(km)) {
-                    list.push("10189906", "10196876", "10925167", "10004211", "10064941");
-                }
-                return list;
-            }
-        }
+        "MG_MAXUS_9": createStandardEV(),
+        "MG_MAXUS_7": createStandardEV(),
+        "MG_ES": createStandardEV(),
+        "MG_EP": createStandardEV(),
+        "MG_CYBERSTER": createStandardEV(),
+        "MG_4_EV_XPOWER": createStandardEV(),
+        "MG_4_EV": createStandardEV(),
+
+        // --- กลุ่มรถน้ำมัน / ไฮบริด ---
+        "NEW_MG_ZS": createStandardICE(),
+        "NEW_MG_VS_HEV": createStandardICE(),
+        "NEW_MG_HS_PHEV": createStandardICE(),
+        "NEW_MG_HS": createStandardICE(),
+        "NEW_MG_6": createStandardICE(),
+        "NEW_MG_5": createStandardICE(),
+        "MG_ZS": createStandardICE(),
+        "MG_V80": createStandardICE(),
+        "MG_GS_2.0T": createStandardICE(),
+        "MG_GS_1.5T": createStandardICE(),
+        "MG_EXTENDER_4WD_AT": createStandardICE(),
+        "MG_EXTENDER_2WD_MT": createStandardICE(),
+        "MG_EXTENDER_2WD_AT": createStandardICE(),
+        "MG_6": createStandardICE(),
+        "MG5_TURBO": createStandardICE(),
+        "MG5_NON_TURBO": createStandardICE(),
+        "MG_3_HYBRID_PLUS": createStandardICE(),
+        "MG_3": createStandardICE(),
+        "ALL_NEW_MG_3": createStandardICE()
     }
 };
 
@@ -601,7 +658,9 @@ for (let km = 10000; km <= 300000; km += 10000) {
 function calculateService() {
     const modelKey = document.getElementById('carModel').value;
     const km = parseInt(document.getElementById('serviceKm').value);
-    const modelData = masterData.schedules[modelKey];
+    
+    // ดึงข้อมูลรุ่นรถ
+    const modelData = masterData.schedules[modelKey] || createStandardICE();
     
     const partKeys = modelData.getParts(km);
     const tbody = document.querySelector('#partsTable tbody');
@@ -614,7 +673,7 @@ function calculateService() {
         tbody.innerHTML = `<tr><td colspan="5" class="text-center" style="color:#aaa;">ไม่มีรายการเปลี่ยนอะไหล่ในรอบนี้ (ตรวจเช็กตามระยะฟรี/ปกติ)</td></tr>`;
     } else {
         partKeys.forEach((key, idx) => {
-            const item = partsDB[key];
+            const item = partsDB[key] || { name: "อะไหล่ตามระยะ", unit: 1, price: 0 };
             const cleanKey = key.replace('_EV', '');
             const itemTotal = item.price * item.unit;
             partsTotal += itemTotal;
@@ -633,7 +692,7 @@ function calculateService() {
     }
 
     // คำนวณค่าแรง
-    const hours = modelData.labourHours[km] || 0;
+    const hours = modelData.labourHours[km] || 1.5;
     const isFree = modelData.labourFreeKm.includes(km);
     const labourCost = isFree ? 0 : (hours * modelData.labourRatePerHour);
 
