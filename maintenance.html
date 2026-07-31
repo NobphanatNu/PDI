@@ -8,9 +8,7 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;700&display=swap');
   
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   font-family: 'Sarabun', Arial, sans-serif;
@@ -38,7 +36,7 @@ body {
   z-index: -1;
 }
 
-/* ===== แถบด้านบน (Top Bar) แบบเดียวกับหน้าหลัก ===== */
+/* ===== แถบด้านบน (Top Bar) ===== */
 .topbar {
   position: fixed;
   top: 0;
@@ -75,9 +73,7 @@ body {
   transition: transform 0.2s ease;
 }
 
-.hamburger-btn:hover {
-  transform: scale(1.1);
-}
+.hamburger-btn:hover { transform: scale(1.1); }
 
 .topbar img {
   width: 120px;
@@ -102,7 +98,7 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== เพิ่มส่วน Filter Select ใน Topbar ===== */
+/* ===== ส่วน Filter Select ใน Topbar ===== */
 .topbar-filters {
   display: flex;
   align-items: center;
@@ -136,10 +132,7 @@ body {
   cursor: pointer;
 }
 
-.filter-group select option {
-  background: #1a1a24;
-  color: #fff;
-}
+.filter-group select option { background: #1a1a24; color: #fff; }
 
 /* ===== ปุ่มออกจากระบบ ด้านขวาบน ===== */
 .btn-logout {
@@ -177,10 +170,7 @@ body {
   transition: opacity 0.3s ease;
 }
 
-.scrim.active {
-  opacity: 1;
-  pointer-events: auto;
-}
+.scrim.active { opacity: 1; pointer-events: auto; }
 
 .nav-drawer {
   position: fixed;
@@ -200,9 +190,7 @@ body {
   padding: 20px 0;
 }
 
-.nav-drawer.open {
-  left: 0;
-}
+.nav-drawer.open { left: 0; }
 
 .drawer-header {
   padding: 0 20px 20px 20px;
@@ -361,7 +349,7 @@ textarea {
     <video id="bg-video" autoplay muted playsinline></video>
     <div class="video-overlay"></div>
 
-    <!-- Scrim (แผ่นเงาเมื่อสไลด์เปิดเมนู) -->
+    <!-- Scrim -->
     <div id="scrim" class="scrim"></div>
 
     <!-- Hamburger Nav Drawer ด้านข้าง -->
@@ -374,7 +362,7 @@ textarea {
         </ul>
     </nav>
 
-    <!-- แถบ Topbar สไตล์หลัก + เพิ่ม Filter Select -->
+    <!-- แถบ Topbar สไตล์หลัก + Dropdown เลือกรุ่นและระยะทาง -->
     <div class="topbar">
         <div class="topbar-left">
             <button id="hamburgerBtn" class="hamburger-btn" aria-label="Toggle menu">☰</button>
@@ -385,12 +373,13 @@ textarea {
             </div>
         </div>
 
-        <!-- แถบตัวเลือกข้อมูล (เลือกรุ่น / ระยะทาง) -->
+        <!-- ตัวเลือกข้อมูล (รุ่น / ระยะทาง) -->
         <div class="topbar-filters">
             <div class="filter-group">
                 <label for="carModel">🚘 รุ่น:</label>
-                <select id="carModel" disabled>
-                    <option value="NEW_MG_ZS" selected>NEW MG ZS</option>
+                <select id="carModel" onchange="calculateService()">
+                    <option value="NEW_MG_ZS">NEW MG ZS</option>
+                    <option value="MG3">MG 3</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -436,7 +425,7 @@ textarea {
     </div>
 
 <script>
-// ===== JavaScript ควบคุม Hamburger Menu (Nav Drawer) =====
+// ===== JavaScript ควบคุม Hamburger Menu =====
 const hamburgerBtn = document.getElementById('hamburgerBtn');
 const navDrawer = document.getElementById('navDrawer');
 const scrim = document.getElementById('scrim');
@@ -469,15 +458,11 @@ const videoPlayer = document.getElementById("bg-video");
 
 function playNextVideo() {
   if (!videoPlayer || videoSources.length === 0) return;
-  
   videoPlayer.src = videoSources[currentVideoIndex];
   videoPlayer.load();
-  
   videoPlayer.play().catch(err => {
-    console.log("วิดีโอโหลดไม่สำเร็จ กำลังข้ามไปตัวถัดไป...", err);
     setTimeout(playNextVideo, 1000); 
   });
-  
   currentVideoIndex = (currentVideoIndex + 1) % videoSources.length;
 }
 
@@ -485,16 +470,16 @@ if (videoPlayer) {
   videoPlayer.addEventListener("ended", playNextVideo);
   videoPlayer.addEventListener("error", playNextVideo);
 }
-
 window.addEventListener("DOMContentLoaded", playNextVideo);
 
-// ===== ระบบคำนวณอะไหล่เช็กระยะ =====
+// ===== ฐานข้อมูลอะไหล่ของแต่ละรุ่น =====
 const partsDB = {
+    // 1. NEW MG ZS
     "10134155": { name: "น้ำมันเครื่องสังเคราะห์ 5W30 A5/B5 4 ลิตร", price: 1495 },
     "11486328": { name: "ไส้กรองน้ำมันเครื่อง", price: 240 },
     "ALU1403":  { name: "แหวนรองน็อตถ่ายน้ำมันเครื่อง", price: 12 },
-    "G00000362": { name: "ไส้กรองอากาศ", price: 355 },
-    "G00000266": { name: "ไส้กรองแอร์พรีเมียม PM 2.5", price: 590 },
+    "G00000362": { name: "ไส้กรองอากาศ (ZS)", price: 355 },
+    "G00000266": { name: "ไส้กรองแอร์พรีเมียม PM 2.5 (ZS)", price: 590 },
     "10189906": { name: "น้ำยาหม้อน้ำ 4 ลิตร", price: 790 },
     "10196876": { name: "น้ำยาหม้อน้ำ 1 ลิตร", price: 195 },
     "G00000459": { name: "น้ำมันเบรก 1 ลิตร", price: 498 },
@@ -506,39 +491,62 @@ const partsDB = {
     "10406973": { name: "ไส้กรองเครื่องกรองแรงดันเกียร์", price: 170 },
     "10412354": { name: "โอริงไส้กรองเครื่องกรองแรงดันเกียร์", price: 9 },
     "11446616": { name: "หัวเทียน Spark plug", price: 165 },
-    "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter", price: 235 }
+    "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter (ZS)", price: 235 },
+
+    // 2. MG 3
+    "G00000364": { name: "ไส้กรองอากาศ (MG 3)", price: 280 },
+    "G00000269": { name: "ไส้กรองแอร์ PM 2.5 (MG 3)", price: 565 },
+    "FLYS0040A": { name: "น้ำมันเกียร์ AMT 1 ลิตร", price: 475 },
+    "10064941": { name: "แหวนถ่ายน้ำมันเกียร์ (MG 3)", price: 9 },
+    "10096408": { name: "ไส้กรองน้ำมันเชื้อเพลิง (MG 3)", price: 945 }
 };
 
-function getPartsForKm(km) {
+// ดึงรายการอะไหล่ NEW MG ZS
+function getPartsForZS(km) {
     let list = [
         { code: "10134155", qty: 1 },
         { code: "11486328", qty: 1 },
         { code: "ALU1403", qty: 1 }
     ];
-
     if (km % 30000 === 0) {
-        list.push({ code: "G00000362", qty: 1 });
-        list.push({ code: "11446616", qty: 4 });
+        list.push({ code: "G00000362", qty: 1 }, { code: "11446616", qty: 4 });
     }
     if (km % 40000 === 0) {
-        list.push({ code: "G00000266", qty: 1 });
-        list.push({ code: "10137854", qty: 1 });
+        list.push({ code: "G00000266", qty: 1 }, { code: "10137854", qty: 1 });
     }
     if (km % 60000 === 0) {
         list.push({ code: "G00000459", qty: 1 });
     }
     if (km % 80000 === 0) {
-        list.push({ code: "10471721", qty: 4 });
-        list.push({ code: "10407695", qty: 1 });
-        list.push({ code: "10811222", qty: 1 });
-        list.push({ code: "10501598", qty: 1 });
-        list.push({ code: "10406912", qty: 1 });
-        list.push({ code: "10406973", qty: 1 });
-        list.push({ code: "10412354", qty: 1 });
+        list.push({ code: "10471721", qty: 4 }, { code: "10407695", qty: 1 }, { code: "10811222", qty: 1 }, { code: "10501598", qty: 1 }, { code: "10406912", qty: 1 }, { code: "10406973", qty: 1 }, { code: "10412354", qty: 1 });
+    }
+    if (km % 100000 === 0) {
+        list.push({ code: "10189906", qty: 1 }, { code: "10196876", qty: 1 });
+    }
+    return list;
+}
+
+// ดึงรายการอะไหล่ MG 3
+function getPartsForMG3(km) {
+    let list = [
+        { code: "10134155", qty: 1 },
+        { code: "11486328", qty: 1 },
+        { code: "ALU1403", qty: 1 }
+    ];
+    if (km % 30000 === 0) {
+        list.push({ code: "G00000364", qty: 1 }, { code: "11446616", qty: 4 });
+    }
+    if (km % 40000 === 0) {
+        list.push({ code: "G00000269", qty: 1 }, { code: "10096408", qty: 1 });
+    }
+    if (km % 60000 === 0) {
+        list.push({ code: "G00000459", qty: 1 });
+    }
+    if (km % 80000 === 0) {
+        list.push({ code: "FLYS0040A", qty: 2 }, { code: "10064941", qty: 2 });
     }
     if (km % 100000 === 0) {
         list.push({ code: "10189906", qty: 1 });
-        list.push({ code: "10196876", qty: 1 });
     }
     return list;
 }
@@ -553,9 +561,13 @@ for (let km = 10000; km <= 300000; km += 10000) {
     kmSelect.appendChild(opt);
 }
 
+// ฟังก์ชั่นคำนวณราคา
 function calculateService() {
+    const model = document.getElementById('carModel').value;
     const km = parseInt(document.getElementById('serviceKm').value);
-    const requiredParts = getPartsForKm(km);
+    
+    let requiredParts = (model === "NEW_MG_ZS") ? getPartsForZS(km) : getPartsForMG3(km);
+    
     const tbody = document.querySelector('#partsTable tbody');
     tbody.innerHTML = '';
     
@@ -587,7 +599,8 @@ function calculateService() {
     document.getElementById('vatTotal').innerText = `${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
     document.getElementById('grandTotal').innerText = `${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
 
-    let copyStr = `รายการอะไหล่เช็กระยะ NEW MG ZS - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
+    const modelNameDisplay = (model === "NEW_MG_ZS") ? "NEW MG ZS" : "MG 3";
+    let copyStr = `รายการอะไหล่เช็กระยะ ${modelNameDisplay} - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
     copyStr += `----------------------------------------\n`;
     copyStr += summaryTextParts.join('\n') + `\n`;
     copyStr += `----------------------------------------\n`;
