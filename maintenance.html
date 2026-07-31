@@ -98,7 +98,7 @@ body {
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
 }
 
-/* ===== ส่วน Filter Select ใน Topbar (แก้ไข Z-Index & Margin หนีการทับ) ===== */
+/* ===== ส่วน Filter Select ใน Topbar ===== */
 .topbar-filters {
   display: flex;
   align-items: center;
@@ -385,6 +385,7 @@ textarea {
                 <select id="carModel" onchange="calculateService()">
                     <option value="NEW_MG_ZS">NEW MG ZS</option>
                     <option value="MG3">MG 3</option>
+                    <option value="ALL_NEW_MG3">ALL NEW MG 3</option>
                 </select>
             </div>
             <div class="filter-group">
@@ -498,12 +499,20 @@ const partsDB = {
     "11446616": { name: "หัวเทียน Spark plug", price: 165 },
     "10137854": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter (ZS)", price: 235 },
 
-    // 2. MG 3
+    // 2. MG 3 (รุ่นเดิม)
     "G00000364": { name: "ไส้กรองอากาศ (MG 3)", price: 280 },
-    "G00000269": { name: "ไส้กรองแอร์ PM 2.5 (MG 3)", price: 565 },
+    "G00000269": { name: "ไส้กรองแอร์ PM 2.5", price: 565 },
     "FLYS0040A": { name: "น้ำมันเกียร์ AMT 1 ลิตร", price: 475 },
     "10064941": { name: "แหวนถ่ายน้ำมันเกียร์ (MG 3)", price: 9 },
-    "10096408": { name: "ไส้กรองน้ำมันเชื้อเพลิง (MG 3)", price: 945 }
+    "10096408": { name: "ไส้กรองน้ำมันเชื้อเพลิง Fuel filter", price: 945 },
+
+    // 3. ALL NEW MG 3 (เพิ่มใหม่จากตาราง)
+    "G00000363": { name: "ไส้กรองอากาศ (ALL NEW MG 3)", price: 260 },
+    "10121945": { name: "น้ำมันเกียร์อัตโนมัติ 1 ลิตร", price: 680 },
+    "10144408": { name: "แหวนรองเติมน้ำมันเกียร์", price: 64 },
+    "10034242": { name: "แหวนถ่ายน้ำมันเกียร์", price: 50 },
+    "10421236": { name: "ไส้กรองน้ำมันเกียร์", price: 840 },
+    "10144423": { name: "ซีลรองน้ำมันเกียร์ (O-Ring)", price: 18 }
 };
 
 // ดึงรายการอะไหล่ NEW MG ZS
@@ -531,7 +540,7 @@ function getPartsForZS(km) {
     return list;
 }
 
-// ดึงรายการอะไหล่ MG 3
+// ดึงรายการอะไหล่ MG 3 (รุ่นเดิม)
 function getPartsForMG3(km) {
     let list = [
         { code: "10134155", qty: 1 },
@@ -556,6 +565,37 @@ function getPartsForMG3(km) {
     return list;
 }
 
+// ดึงรายการอะไหล่ ALL NEW MG 3 (อ้างอิงตามตารางรูปภาพ)
+function getPartsForAllNewMG3(km) {
+    let list = [
+        { code: "10134155", qty: 1 },
+        { code: "11486328", qty: 1 },
+        { code: "ALU1403", qty: 1 }
+    ];
+    if (km % 30000 === 0) {
+        list.push({ code: "G00000363", qty: 1 }, { code: "11446616", qty: 4 });
+    }
+    if (km % 40000 === 0) {
+        list.push({ code: "G00000269", qty: 1 }, { code: "10096408", qty: 1 });
+    }
+    if (km % 60000 === 0) {
+        list.push({ code: "G00000459", qty: 1 });
+    }
+    if (km % 80000 === 0) {
+        list.push(
+            { code: "10121945", qty: 5 }, 
+            { code: "10144408", qty: 1 }, 
+            { code: "10034242", qty: 1 }, 
+            { code: "10421236", qty: 1 }, 
+            { code: "10144423", qty: 1 }
+        );
+    }
+    if (km % 100000 === 0) {
+        list.push({ code: "10189906", qty: 1 }, { code: "10196876", qty: 2 });
+    }
+    return list;
+}
+
 // เติม Option ระยะทาง (10,000 - 300,000 กม.)
 const kmSelect = document.getElementById('serviceKm');
 for (let km = 10000; km <= 300000; km += 10000) {
@@ -571,7 +611,19 @@ function calculateService() {
     const model = document.getElementById('carModel').value;
     const km = parseInt(document.getElementById('serviceKm').value);
     
-    let requiredParts = (model === "NEW_MG_ZS") ? getPartsForZS(km) : getPartsForMG3(km);
+    let requiredParts = [];
+    let modelNameDisplay = "";
+
+    if (model === "NEW_MG_ZS") {
+        requiredParts = getPartsForZS(km);
+        modelNameDisplay = "NEW MG ZS";
+    } else if (model === "MG3") {
+        requiredParts = getPartsForMG3(km);
+        modelNameDisplay = "MG 3";
+    } else if (model === "ALL_NEW_MG3") {
+        requiredParts = getPartsForAllNewMG3(km);
+        modelNameDisplay = "ALL NEW MG 3";
+    }
     
     const tbody = document.querySelector('#partsTable tbody');
     tbody.innerHTML = '';
@@ -604,7 +656,6 @@ function calculateService() {
     document.getElementById('vatTotal').innerText = `${vat.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
     document.getElementById('grandTotal').innerText = `${grandTotal.toLocaleString('th-TH', {minimumFractionDigits: 2})} บาท`;
 
-    const modelNameDisplay = (model === "NEW_MG_ZS") ? "NEW MG ZS" : "MG 3";
     let copyStr = `รายการอะไหล่เช็กระยะ ${modelNameDisplay} - ${km.toLocaleString()} กม. (${km/10000 * 6} เดือน)\n`;
     copyStr += `----------------------------------------\n`;
     copyStr += summaryTextParts.join('\n') + `\n`;
